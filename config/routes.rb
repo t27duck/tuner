@@ -6,6 +6,9 @@ Rails.application.routes.draw do
   end
   resource :sync_status, only: :create
   resource :bulk_update, only: :update
+  resource :organize, only: %i[new create] do
+    post :preview, on: :collection
+  end
 
   get "up" => "rails/health#show", as: :rails_health_check
 

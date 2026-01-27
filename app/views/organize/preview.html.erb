@@ -1,0 +1,33 @@
+<div class="max-w-5xl">
+  <h1 class="text-2xl font-bold mb-4">Preview Changes</h1>
+  <p class="text-gray-400 text-sm mb-4">Template: <code><%= @template %></code></p>
+
+  <% if @changes.empty? %>
+    <p class="text-gray-500">No files would be moved.</p>
+  <% else %>
+    <table class="w-full text-sm text-left mb-6">
+      <thead class="text-xs text-gray-400 uppercase bg-gray-900 border-b border-gray-800">
+        <tr>
+          <th class="px-4 py-3">Current Path</th>
+          <th class="px-4 py-3">New Path</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @changes.each do |change| %>
+          <tr class="border-b border-gray-800">
+            <td class="px-4 py-3 text-gray-400 truncate max-w-xs"><%= change[:old_path] %></td>
+            <td class="px-4 py-3 text-green-400 truncate max-w-xs"><%= change[:new_path] %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <%= form_with url: organize_path, method: :post do %>
+      <input type="hidden" name="template" value="<%= @template %>">
+      <div class="flex gap-4">
+        <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded cursor-pointer">Apply Changes</button>
+        <%= link_to "Cancel", new_organize_path, class: "text-gray-400 hover:text-gray-300 py-2" %>
+      </div>
+    <% end %>
+  <% end %>
+</div>

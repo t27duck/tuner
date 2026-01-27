@@ -1,0 +1,16 @@
+<div class="max-w-3xl">
+  <h1 class="text-2xl font-bold mb-4">Organize Files</h1>
+  <p class="text-gray-400 text-sm mb-6">
+    Available tokens: <code>&lt;Artist&gt;</code>, <code>&lt;Album&gt;</code>, <code>&lt;Title&gt;</code>,
+    <code>&lt;Genre&gt;</code>, <code>&lt;Year&gt;</code>, <code>&lt;Disc&gt;</code>,
+    <code>&lt;Track&gt;</code>, <code>&lt;Track:N&gt;</code> (zero-padded), <code>&lt;Filename&gt;</code>
+  </p>
+
+  <%= form_with url: preview_organize_index_path, method: :post, class: "space-y-4" do |f| %>
+    <div>
+      <label for="template" class="block text-sm text-gray-400 mb-1">Path Template</label>
+      <input type="text" name="template" id="template" value="<Artist>/<Album>/<Track:2> - <Title>" class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-gray-100 focus:outline-none focus:border-blue-500">
+    </div>
+    <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded cursor-pointer">Preview Changes</button>
+  <% end %>
+</div>
