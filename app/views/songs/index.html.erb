@@ -87,7 +87,11 @@
     </thead>
     <tbody>
       <% @songs.each do |song| %>
-        <tr class="border-b border-gray-800 hover:bg-gray-900/50">
+        <%= tag.tr class: "border-b border-gray-800 hover:bg-gray-900/50",
+            data: { controller: "context-menu",
+                    context_menu_edit_url_value: edit_song_path(song),
+                    context_menu_delete_url_value: song_path(song),
+                    context_menu_song_title_value: song.title } do %>
           <td class="px-4 py-3">
             <input type="checkbox" value="<%= song.id %>" data-multi-select-target="checkbox" data-action="change->multi-select#toggle" aria-label="Select <%= song.title %>" class="rounded bg-gray-800 border-gray-700">
           </td>
@@ -102,7 +106,7 @@
           <td class="px-4 py-3">
             <%= link_to "Edit", edit_song_path(song), class: "text-blue-400 hover:text-blue-300" %>
           </td>
-        </tr>
+        <% end %>
       <% end %>
     </tbody>
   </table>

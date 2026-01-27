@@ -34,11 +34,13 @@ class SongsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "New Title", @song.reload.title
   end
 
-  test "destroy" do
+  test "destroy removes song and file from disk" do
+    assert File.exist?(@song.file_path)
     assert_difference("Song.count", -1) do
       delete song_url(@song)
     end
     assert_redirected_to songs_path
+    assert_not File.exist?(@song.file_path)
   end
 
   test "root routes to songs index" do

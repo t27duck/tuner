@@ -46,6 +46,7 @@ class SongsController < ApplicationController
   end
 
   def destroy
+    File.delete(@song.file_path) if File.exist?(@song.file_path)
     @song.destroy
     redirect_to songs_path, notice: "Song deleted."
   end
