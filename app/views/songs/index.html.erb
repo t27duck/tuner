@@ -26,13 +26,14 @@
     <tbody>
       <% @songs.each do |song| %>
         <tr class="border-b border-gray-800 hover:bg-gray-900/50">
-          <td class="px-4 py-3 font-medium text-gray-100"><%= song.title %></td>
-          <td class="px-4 py-3 text-gray-300"><%= song.artist %></td>
-          <td class="px-4 py-3 text-gray-300"><%= song.album %></td>
-          <td class="px-4 py-3 text-gray-300"><%= song.genre %></td>
-          <td class="px-4 py-3 text-gray-300"><%= song.year %></td>
-          <td class="px-4 py-3 text-gray-300"><%= song.track_number %></td>
-          <td class="px-4 py-3 text-gray-300"><%= song.disc_number %></td>
+          <% %w[title artist album genre year track_number disc_number].each do |field| %>
+            <td class="px-4 py-3 <%= field == 'title' ? 'font-medium text-gray-100' : 'text-gray-300' %> cursor-pointer"
+                data-controller="inline-edit"
+                data-inline-edit-url-value="<%= song_path(song) %>"
+                data-inline-edit-field-value="<%= field %>">
+              <%= song.send(field) %>
+            </td>
+          <% end %>
           <td class="px-4 py-3">
             <%= link_to "Edit", edit_song_path(song), class: "text-blue-400 hover:text-blue-300" %>
           </td>

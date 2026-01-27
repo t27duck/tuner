@@ -17,9 +17,15 @@ class SongsController < ApplicationController
     if @song.update(song_params)
       write_tags_to_file(@song)
       write_album_art(@song, params[:song][:album_art]) if params[:song][:album_art].present?
-      redirect_to songs_path, notice: "Song updated."
+      respond_to do |format|
+        format.html { redirect_to songs_path, notice: "Song updated." }
+        format.json { head :ok }
+      end
     else
-      render :edit, status: :unprocessable_entity
+      respond_to do |format|
+        format.html { render :edit, status: :unprocessable_entity }
+        format.json { head :unprocessable_entity }
+      end
     end
   end
 
