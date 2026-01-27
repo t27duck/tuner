@@ -1,0 +1,47 @@
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-2xl font-bold">Songs</h1>
+  <span class="text-gray-400 text-sm"><%= @songs.total_count %> songs</span>
+</div>
+
+<div class="overflow-x-auto">
+  <table class="w-full text-sm text-left">
+    <thead class="text-xs text-gray-400 uppercase bg-gray-900 border-b border-gray-800">
+      <tr>
+        <% [
+          ["title", "Title"],
+          ["artist", "Artist"],
+          ["album", "Album"],
+          ["genre", "Genre"],
+          ["year", "Year"],
+          ["track_number", "Track"],
+          ["disc_number", "Disc"],
+        ].each do |attr, label| %>
+          <th scope="col" class="px-4 py-3">
+            <%= sort_link(@q, attr, label) %>
+          </th>
+        <% end %>
+        <th scope="col" class="px-4 py-3">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @songs.each do |song| %>
+        <tr class="border-b border-gray-800 hover:bg-gray-900/50">
+          <td class="px-4 py-3 font-medium text-gray-100"><%= song.title %></td>
+          <td class="px-4 py-3 text-gray-300"><%= song.artist %></td>
+          <td class="px-4 py-3 text-gray-300"><%= song.album %></td>
+          <td class="px-4 py-3 text-gray-300"><%= song.genre %></td>
+          <td class="px-4 py-3 text-gray-300"><%= song.year %></td>
+          <td class="px-4 py-3 text-gray-300"><%= song.track_number %></td>
+          <td class="px-4 py-3 text-gray-300"><%= song.disc_number %></td>
+          <td class="px-4 py-3">
+            <%= link_to "Edit", edit_song_path(song), class: "text-blue-400 hover:text-blue-300" %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div class="mt-4">
+  <%= paginate @songs %>
+</div>

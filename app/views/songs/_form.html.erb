@@ -1,0 +1,38 @@
+<%= form_with(model: song, class: "space-y-4") do |f| %>
+  <% if song.errors.any? %>
+    <div class="bg-red-900/50 text-red-300 px-4 py-2 rounded border border-red-800">
+      <ul class="list-disc list-inside">
+        <% song.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <% %w[title artist album genre].each do |field| %>
+    <div>
+      <%= f.label field, class: "block text-sm text-gray-400 mb-1" %>
+      <%= f.text_field field, class: "w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-gray-100 focus:outline-none focus:border-blue-500" %>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-3 gap-4">
+    <div>
+      <%= f.label :year, class: "block text-sm text-gray-400 mb-1" %>
+      <%= f.number_field :year, class: "w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-gray-100 focus:outline-none focus:border-blue-500" %>
+    </div>
+    <div>
+      <%= f.label :track_number, "Track", class: "block text-sm text-gray-400 mb-1" %>
+      <%= f.number_field :track_number, class: "w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-gray-100 focus:outline-none focus:border-blue-500" %>
+    </div>
+    <div>
+      <%= f.label :disc_number, "Disc", class: "block text-sm text-gray-400 mb-1" %>
+      <%= f.number_field :disc_number, class: "w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-gray-100 focus:outline-none focus:border-blue-500" %>
+    </div>
+  </div>
+
+  <div class="flex gap-4 pt-2">
+    <%= f.submit "Save", class: "bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded cursor-pointer" %>
+    <%= link_to "Cancel", songs_path, class: "text-gray-400 hover:text-gray-300 py-2" %>
+  </div>
+<% end %>
