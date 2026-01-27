@@ -1,24 +1,15 @@
-# README
+# Tuner
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Tuner is a Rails-based comprehensive MP3 manager.
 
-Things you may want to cover:
+The library defaults to `storage/music` but can be overridden using the `MUSIC_ROOT` environment variable.
 
-* Ruby version
+## Setup
 
-* System dependencies
+- Install Ruby as defined in `.ruby_version`
+- Install dependencies with `$ bundle install`
+- Initialize the database with `$ rails db:setup`
 
-* Configuration
+## Running the app
 
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+- Run `bin/dev` and access the app at `http://localhost:3000`

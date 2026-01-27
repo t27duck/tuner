@@ -61,3 +61,7 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
+
+gem "ransack" # Filtering and sorting
+gem "ruby-mp3info", github: "t27duck/ruby-mp3info", branch: "ruby_34", require: "mp3info"  # ID3 tag reading/writing
+gem "kaminari" # Pagination

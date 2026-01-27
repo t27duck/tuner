@@ -1,4 +1,5 @@
 ENV["RAILS_ENV"] ||= "test"
+ENV["MUSIC_ROOT"] = File.expand_path("music", __dir__)
 require_relative "../config/environment"
 require "rails/test_help"
 
