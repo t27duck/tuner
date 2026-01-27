@@ -5,6 +5,7 @@ Rails.application.routes.draw do
     end
   end
   resource :sync_status, only: :create
+  resource :bulk_update, only: :update
 
   get "up" => "rails/health#show", as: :rails_health_check
 
