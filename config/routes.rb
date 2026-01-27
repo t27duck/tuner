@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
   resources :songs, except: :new
+  resource :sync_status, only: :create
 
   get "up" => "rails/health#show", as: :rails_health_check
 
