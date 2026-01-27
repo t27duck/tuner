@@ -3,6 +3,65 @@
   <span class="text-gray-400 text-sm"><%= @songs.total_count %> songs</span>
 </div>
 
+<div data-controller="search" class="mb-6">
+  <%= search_form_for @q, url: songs_path, html: { "data-search-target": "form", "data-turbo-action": "replace" }, class: "space-y-3" do |f| %>
+    <div class="flex gap-3">
+      <div class="flex-1">
+        <%= f.search_field :title_or_artist_or_album_or_genre_cont, placeholder: "Search songs...", class: "w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-gray-100 text-sm focus:outline-none focus:border-blue-500", "data-action": "input->search#search", "aria-label": "Search songs" %>
+      </div>
+      <button type="button" data-action="click->search#clear" class="text-gray-400 hover:text-gray-200 text-sm px-3">Clear</button>
+    </div>
+
+    <details class="text-sm">
+      <summary class="text-gray-400 cursor-pointer hover:text-gray-200">Advanced Filters</summary>
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mt-3">
+        <div>
+          <%= f.label :title_cont, "Title", class: "block text-xs text-gray-500 mb-1" %>
+          <%= f.search_field :title_cont, class: "w-full bg-gray-800 border border-gray-700 rounded px-2 py-1 text-gray-100 text-sm focus:outline-none focus:border-blue-500", "data-action": "input->search#search" %>
+        </div>
+        <div>
+          <%= f.label :artist_cont, "Artist", class: "block text-xs text-gray-500 mb-1" %>
+          <%= f.search_field :artist_cont, class: "w-full bg-gray-800 border border-gray-700 rounded px-2 py-1 text-gray-100 text-sm focus:outline-none focus:border-blue-500", "data-action": "input->search#search" %>
+        </div>
+        <div>
+          <%= f.label :album_cont, "Album", class: "block text-xs text-gray-500 mb-1" %>
+          <%= f.search_field :album_cont, class: "w-full bg-gray-800 border border-gray-700 rounded px-2 py-1 text-gray-100 text-sm focus:outline-none focus:border-blue-500", "data-action": "input->search#search" %>
+        </div>
+        <div>
+          <%= f.label :genre_cont, "Genre", class: "block text-xs text-gray-500 mb-1" %>
+          <%= f.search_field :genre_cont, class: "w-full bg-gray-800 border border-gray-700 rounded px-2 py-1 text-gray-100 text-sm focus:outline-none focus:border-blue-500", "data-action": "input->search#search" %>
+        </div>
+        <div>
+          <%= f.label :year_eq, "Year", class: "block text-xs text-gray-500 mb-1" %>
+          <%= f.number_field :year_eq, class: "w-full bg-gray-800 border border-gray-700 rounded px-2 py-1 text-gray-100 text-sm focus:outline-none focus:border-blue-500", "data-action": "input->search#search" %>
+        </div>
+        <div>
+          <%= f.label :file_path_cont, "File Path", class: "block text-xs text-gray-500 mb-1" %>
+          <%= f.search_field :file_path_cont, class: "w-full bg-gray-800 border border-gray-700 rounded px-2 py-1 text-gray-100 text-sm focus:outline-none focus:border-blue-500", "data-action": "input->search#search" %>
+        </div>
+      </div>
+      <div class="flex gap-4 mt-3 text-xs text-gray-400">
+        <label class="flex items-center gap-1">
+          <input type="checkbox" name="q[missing_artist]" value="1" <%= "checked" if params.dig(:q, :missing_artist) == "1" %> data-action="change->search#search" class="rounded bg-gray-800 border-gray-700">
+          Missing artist
+        </label>
+        <label class="flex items-center gap-1">
+          <input type="checkbox" name="q[missing_album]" value="1" <%= "checked" if params.dig(:q, :missing_album) == "1" %> data-action="change->search#search" class="rounded bg-gray-800 border-gray-700">
+          Missing album
+        </label>
+        <label class="flex items-center gap-1">
+          <input type="checkbox" name="q[missing_genre]" value="1" <%= "checked" if params.dig(:q, :missing_genre) == "1" %> data-action="change->search#search" class="rounded bg-gray-800 border-gray-700">
+          Missing genre
+        </label>
+        <label class="flex items-center gap-1">
+          <input type="checkbox" name="q[missing_year]" value="1" <%= "checked" if params.dig(:q, :missing_year) == "1" %> data-action="change->search#search" class="rounded bg-gray-800 border-gray-700">
+          Missing year
+        </label>
+      </div>
+    </details>
+  <% end %>
+</div>
+
 <div class="overflow-x-auto">
   <table class="w-full text-sm text-left">
     <thead class="text-xs text-gray-400 uppercase bg-gray-900 border-b border-gray-800">

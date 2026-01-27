@@ -2,9 +2,16 @@ class SongsController < ApplicationController
   before_action :set_song, only: %i[show edit update destroy album_art]
 
   def index
+    if params[:q] && params[:q][:file_path_cont].present?
+      params[:q][:file_path_cont] = params[:q][:file_path_cont].gsub("_", "\\_")
+    end
     @q = Song.ransack(params[:q])
     @q.sorts = "title asc" if @q.sorts.empty?
-    @songs = @q.result.page(params[:page]).per(50)
+    scope = @q.result
+    %w[missing_artist missing_album missing_genre missing_year].each do |s|
+      scope = scope.send(s) if params.dig(:q, s) == "1"
+    end
+    @songs = scope.page(params[:page]).per(50)
   end
 
   def show
