@@ -1,0 +1,10 @@
+{
+  "ignored_warnings": [
+    {
+      "fingerprint": "86d199e6510a69f81d90ccc01d01800990133ea32df82619702bf9536c7c5216",
+      "note": "File path comes from database model set during sync, not from user input. params[:id] only used for record lookup by primary key."
+    }
+  ],
+  "updated": "2026-01-27",
+  "brakeman_version": "7.1.2"
+}
