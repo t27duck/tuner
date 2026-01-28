@@ -20,25 +20,32 @@
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:bg-blue-600 focus:text-white focus:px-4 focus:py-2 focus:rounded">Skip to main content</a>
 
     <nav class="bg-gray-900 border-b border-gray-800 px-4 py-3" aria-label="Main navigation">
-      <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
         <a href="<%= root_path %>" class="text-xl font-bold text-blue-400 hover:text-blue-300" aria-current="<%= 'page' if current_page?(root_path) %>">Tuner</a>
         <div class="flex items-center gap-4">
           <%= link_to "Organize", new_organize_path, class: "text-gray-400 hover:text-gray-200 text-sm" %>
           <span id="sync-status" class="text-xs text-gray-500"></span>
-          <%= button_to "Sync Library", sync_status_path, method: :post, class: "bg-blue-600 hover:bg-blue-500 text-white text-sm px-4 py-1.5 rounded cursor-pointer" %>
+          <%= button_to "Sync Library", sync_status_path, method: :post, class: "bg-blue-600 hover:bg-blue-500 text-white text-sm px-4 py-1.5 rounded cursor-pointer", "aria-label": "Sync music library" %>
         </div>
       </div>
     </nav>
 
     <main id="main-content" class="max-w-7xl mx-auto px-4 py-6">
-      <% if notice %>
-        <div class="mb-4 px-4 py-2 bg-green-900/50 text-green-300 rounded border border-green-800"><%= notice %></div>
-      <% end %>
-      <% if alert %>
-        <div class="mb-4 px-4 py-2 bg-red-900/50 text-red-300 rounded border border-red-800"><%= alert %></div>
-      <% end %>
       <%= yield %>
     </main>
+
+    <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2" aria-live="polite">
+      <% if notice %>
+        <div data-controller="toast" class="px-4 py-2 bg-green-900/80 text-green-300 rounded border border-green-800 shadow-lg transition-all duration-300">
+          <%= notice %>
+        </div>
+      <% end %>
+      <% if alert %>
+        <div data-controller="toast" class="px-4 py-2 bg-red-900/80 text-red-300 rounded border border-red-800 shadow-lg transition-all duration-300">
+          <%= alert %>
+        </div>
+      <% end %>
+    </div>
 
     <div id="aria-live-region" aria-live="polite" aria-atomic="true" class="sr-only"></div>
   </body>

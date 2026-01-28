@@ -17,9 +17,9 @@ class Song < ApplicationRecord
     nil
   end
 
-  scope :missing_artist, -> { where(artist: [nil, ""]) }
-  scope :missing_album, -> { where(album: [nil, ""]) }
-  scope :missing_genre, -> { where(genre: [nil, ""]) }
+  scope :missing_artist, -> { where(artist: [ nil, "" ]) }
+  scope :missing_album, -> { where(album: [ nil, "" ]) }
+  scope :missing_genre, -> { where(genre: [ nil, "" ]) }
   scope :missing_year, -> { where(year: nil) }
 
   def self.ransackable_attributes(auth_object = nil)

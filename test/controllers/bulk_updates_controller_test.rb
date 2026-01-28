@@ -36,7 +36,7 @@ class BulkUpdatesControllerTest < ActionDispatch::IntegrationTest
 
   test "bulk update writes to ID3 tags" do
     patch bulk_update_path, params: {
-      song_ids: [@songs.first.id],
+      song_ids: [ @songs.first.id ],
       bulk: { artist: "Tagged Artist" }
     }
 

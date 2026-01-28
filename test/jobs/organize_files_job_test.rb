@@ -33,7 +33,7 @@ class OrganizeFilesJobTest < ActiveSupport::TestCase
   end
 
   test "sanitizes filenames" do
-    song = create_test_song("song 1.mp3", "song1.mp3", title: 'Bad:Name?', artist: "Art*ist")
+    song = create_test_song("song 1.mp3", "song1.mp3", title: "Bad:Name?", artist: "Art*ist")
 
     OrganizeFilesJob.perform_now("<Artist>/<Title>")
 
