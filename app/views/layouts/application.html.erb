@@ -19,16 +19,22 @@
   <body class="bg-gray-950 text-gray-100 min-h-screen">
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:bg-blue-600 focus:text-white focus:px-4 focus:py-2 focus:rounded">Skip to main content</a>
 
-    <nav class="bg-gray-900 border-b border-gray-800 px-4 py-3" aria-label="Main navigation">
-      <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-        <a href="<%= root_path %>" class="text-xl font-bold text-blue-400 hover:text-blue-300" aria-current="<%= 'page' if current_page?(root_path) %>">Tuner</a>
-        <div class="flex items-center gap-4">
-          <%= link_to "Organize", new_organize_path, class: "text-gray-400 hover:text-gray-200 text-sm" %>
-          <span id="sync-status" class="text-xs text-gray-500"></span>
-          <%= button_to "Sync Library", sync_status_path, method: :post, class: "bg-blue-600 hover:bg-blue-500 text-white text-sm px-4 py-1.5 rounded cursor-pointer", "aria-label": "Sync music library" %>
+    <div data-controller="sync-status">
+      <nav class="bg-gray-900 border-b border-gray-800 px-4 py-3" aria-label="Main navigation">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+          <a href="<%= root_path %>" class="text-xl font-bold text-blue-400 hover:text-blue-300" aria-current="<%= 'page' if current_page?(root_path) %>">Tuner</a>
+          <div class="flex items-center gap-4">
+            <%= link_to "Organize", new_organize_path, class: "text-gray-400 hover:text-gray-200 text-sm" %>
+            <%= button_to "Sync Library", sync_status_path, method: :post, class: "bg-blue-600 hover:bg-blue-500 text-white text-sm px-4 py-1.5 rounded cursor-pointer", "aria-label": "Sync music library", data: { sync_status_target: "button" } %>
+          </div>
         </div>
+      </nav>
+
+      <div data-sync-status-target="status" class="hidden text-xs py-1.5 px-4 bg-gray-900 border-b border-gray-800 max-w-7xl mx-auto flex items-center gap-3">
+        <span data-sync-status-target="progress" class="shrink-0 font-mono"></span>
+        <span data-sync-status-target="message" class="truncate text-gray-400"></span>
       </div>
-    </nav>
+    </div>
 
     <main id="main-content" class="max-w-7xl mx-auto px-4 py-6">
       <%= yield %>
