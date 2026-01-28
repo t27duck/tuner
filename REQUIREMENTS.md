@@ -14,8 +14,13 @@ Build a MP3 management web app to manage my local library of MP3s.
 - Default to filename if no title tag found
 - Automatic sync: removes database entries when files are deleted from disk
 - Real-time sync progress via WebSocket (ActionCable)
-- Sync status display with color-coded badges (pending, running, completed, failed)
-- Shows current file being processed during sync
+- Sync progress bar below navigation with stable counter (current/total) and current filename
+- Color-coded status text: blue (running), green (completed), red (failed)
+- Completed status auto-hides after 5 seconds
+- Sync button disabled while sync is running
+- Re-syncing updates existing song metadata instead of skipping
+- Per-file error handling: individual import failures are logged without aborting the sync
+- MP3 tag string sanitization (invalid UTF-8, null characters)
 
 ### Metadata Editing
 - Edit song metadata: title, artist, album, genre, year, disc number, track number

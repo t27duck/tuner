@@ -7,7 +7,7 @@ class Song < ApplicationRecord
     Mp3Info.open(file_path) do |mp3|
       pics = mp3.tag2.pictures
       if pics.any?
-        desc, data = pics.first
+        _desc, data = pics.first
         mime = data&.start_with?("\x89PNG") ? "image/png" : "image/jpeg"
         return { data: data, mime_type: mime }
       end

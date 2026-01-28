@@ -4,7 +4,7 @@ Rails.application.routes.draw do
       get :album_art
     end
   end
-  resource :sync_status, only: :create
+  resource :sync_status, only: :create, controller: "sync_status"
   resource :bulk_update, only: :update
   resource :organize, only: %i[new create] do
     post :preview, on: :collection
