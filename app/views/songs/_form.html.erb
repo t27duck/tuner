@@ -34,7 +34,7 @@
   <div>
     <label class="block text-sm text-gray-400 mb-1">Album Art</label>
     <% if song.persisted? && song.album_art %>
-      <img src="<%= album_art_song_path(song) %>" alt="Album art for <%= song.title %> by <%= song.artist %>" class="w-32 h-32 object-cover rounded mb-2">
+      <%= image_tag album_art_song_path(song), alt: "Album art for #{song.title} by #{song.artist}", class: "w-32 h-32 object-cover rounded mb-2" %>
     <% end %>
     <%= f.file_field :album_art, accept: "image/*", class: "text-sm text-gray-400 file:bg-gray-800 file:text-gray-300 file:border file:border-gray-700 file:rounded file:px-3 file:py-1 file:mr-3 file:cursor-pointer" %>
   </div>

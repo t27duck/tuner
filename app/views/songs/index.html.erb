@@ -75,12 +75,12 @@
         <% %w[artist album genre].each do |field| %>
           <div>
             <label for="bulk_<%= field %>" class="block text-xs text-gray-500 mb-1"><%= field.titleize %></label>
-            <input type="text" name="bulk[<%= field %>]" id="bulk_<%= field %>" class="w-full bg-gray-800 border border-gray-700 rounded px-2 py-1 text-gray-100 text-sm focus:outline-none focus:border-blue-500">
+            <input type="text" name="bulk[<%= field %>]" id="bulk_<%= field %>" class="w-full bg-gray-800 border border-gray-700 rounded px-2 py-1 text-gray-100 text-sm focus:outline-none focus:border-blue-500" autocomplete="off">
           </div>
         <% end %>
         <div>
           <label for="bulk_year" class="block text-xs text-gray-500 mb-1">Year</label>
-          <input type="number" name="bulk[year]" id="bulk_year" class="w-full bg-gray-800 border border-gray-700 rounded px-2 py-1 text-gray-100 text-sm focus:outline-none focus:border-blue-500">
+          <input type="number" name="bulk[year]" id="bulk_year" class="w-full bg-gray-800 border border-gray-700 rounded px-2 py-1 text-gray-100 text-sm focus:outline-none focus:border-blue-500" autocomplete="off">
         </div>
       </div>
       <div>

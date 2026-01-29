@@ -13,7 +13,7 @@
   <%= form_with url: preview_organize_path, method: :post, data: { turbo: false }, class: "space-y-4" do |f| %>
     <div>
       <label for="template" class="block text-sm text-gray-400 mb-1">Path Template</label>
-      <input type="text" name="template" id="template" value="<Artist>/<Album>/<Track:2> - <Title>" class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-gray-100 focus:outline-none focus:border-blue-500">
+      <input type="text" name="template" id="template" value="<Artist>/<Album>/<Track:2> - <Title>" class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-gray-100 focus:outline-none focus:border-blue-500" autocomplete="off">
     </div>
     <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded cursor-pointer">Preview Changes</button>
   <% end %>
