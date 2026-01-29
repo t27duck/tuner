@@ -23,6 +23,11 @@ export default class extends Controller {
     this.countTarget.textContent = count > 0 ? `${count} selected` : ""
     this.bulkActionsTarget.classList.toggle("hidden", count === 0)
     this.selectAllTarget.checked = count > 0 && count === this.checkboxTargets.length
+
+    const liveRegion = document.getElementById("aria-live-region")
+    if (liveRegion) {
+      liveRegion.textContent = count > 0 ? `${count} songs selected` : "No songs selected"
+    }
   }
 
   submitWithIds(event) {

@@ -5,6 +5,15 @@ export default class extends Controller {
 
   connect() {
     this.element.addEventListener("dblclick", this.startEdit.bind(this))
+    this.element.addEventListener("keydown", this.onKeydown.bind(this))
+    this.element.setAttribute("title", `Double-click or press Enter to edit ${this.fieldValue}`)
+  }
+
+  onKeydown(event) {
+    if ((event.key === "Enter" || event.key === " ") && !this.editing) {
+      event.preventDefault()
+      this.startEdit()
+    }
   }
 
   startEdit() {
@@ -16,6 +25,7 @@ export default class extends Controller {
     input.type = this.fieldValue === "year" || this.fieldValue === "track_number" || this.fieldValue === "disc_number" ? "number" : "text"
     input.value = this.originalValue
     input.className = "bg-gray-800 border border-blue-500 rounded px-2 py-1 text-gray-100 text-sm w-full focus:outline-none"
+    input.setAttribute("aria-label", `Edit ${this.fieldValue}`)
     input.addEventListener("keydown", (e) => {
       if (e.key === "Enter") this.save(input)
       if (e.key === "Escape") this.cancel()

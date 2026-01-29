@@ -9,34 +9,34 @@
       <div class="flex-1">
         <%= f.search_field :title_or_artist_or_album_or_genre_cont, placeholder: "Search songs...", class: "w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-gray-100 text-sm focus:outline-none focus:border-blue-500", "data-action": "input->search#search", "aria-label": "Search songs" %>
       </div>
-      <button type="button" data-action="click->search#clear" class="text-gray-400 hover:text-gray-200 text-sm px-3">Clear</button>
+      <button type="button" data-action="click->search#clear" class="text-gray-400 hover:text-gray-200 text-sm px-3" aria-label="Clear all search filters">Clear</button>
     </div>
 
     <details class="text-sm">
       <summary class="text-gray-400 cursor-pointer hover:text-gray-200">Advanced Filters</summary>
       <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mt-3">
         <div>
-          <%= f.label :title_cont, "Title", class: "block text-xs text-gray-500 mb-1" %>
+          <%= f.label :title_cont, "Title", class: "block text-xs text-gray-400 mb-1" %>
           <%= f.search_field :title_cont, class: "w-full bg-gray-800 border border-gray-700 rounded px-2 py-1 text-gray-100 text-sm focus:outline-none focus:border-blue-500", "data-action": "input->search#search" %>
         </div>
         <div>
-          <%= f.label :artist_cont, "Artist", class: "block text-xs text-gray-500 mb-1" %>
+          <%= f.label :artist_cont, "Artist", class: "block text-xs text-gray-400 mb-1" %>
           <%= f.search_field :artist_cont, class: "w-full bg-gray-800 border border-gray-700 rounded px-2 py-1 text-gray-100 text-sm focus:outline-none focus:border-blue-500", "data-action": "input->search#search" %>
         </div>
         <div>
-          <%= f.label :album_cont, "Album", class: "block text-xs text-gray-500 mb-1" %>
+          <%= f.label :album_cont, "Album", class: "block text-xs text-gray-400 mb-1" %>
           <%= f.search_field :album_cont, class: "w-full bg-gray-800 border border-gray-700 rounded px-2 py-1 text-gray-100 text-sm focus:outline-none focus:border-blue-500", "data-action": "input->search#search" %>
         </div>
         <div>
-          <%= f.label :genre_cont, "Genre", class: "block text-xs text-gray-500 mb-1" %>
+          <%= f.label :genre_cont, "Genre", class: "block text-xs text-gray-400 mb-1" %>
           <%= f.search_field :genre_cont, class: "w-full bg-gray-800 border border-gray-700 rounded px-2 py-1 text-gray-100 text-sm focus:outline-none focus:border-blue-500", "data-action": "input->search#search" %>
         </div>
         <div>
-          <%= f.label :year_eq, "Year", class: "block text-xs text-gray-500 mb-1" %>
+          <%= f.label :year_eq, "Year", class: "block text-xs text-gray-400 mb-1" %>
           <%= f.number_field :year_eq, class: "w-full bg-gray-800 border border-gray-700 rounded px-2 py-1 text-gray-100 text-sm focus:outline-none focus:border-blue-500", "data-action": "input->search#search" %>
         </div>
         <div>
-          <%= f.label :file_path_cont, "File Path", class: "block text-xs text-gray-500 mb-1" %>
+          <%= f.label :file_path_cont, "File Path", class: "block text-xs text-gray-400 mb-1" %>
           <%= f.search_field :file_path_cont, class: "w-full bg-gray-800 border border-gray-700 rounded px-2 py-1 text-gray-100 text-sm focus:outline-none focus:border-blue-500", "data-action": "input->search#search" %>
         </div>
       </div>
@@ -69,23 +69,24 @@
 
   <div data-multi-select-target="bulkActions" class="hidden mb-4 bg-gray-900 border border-gray-800 rounded p-4">
     <h3 class="text-sm font-medium text-gray-300 mb-3">Selected Songs</h3>
+    <p id="bulk-description" class="sr-only">Applies to all selected songs</p>
     <%= form_with url: bulk_update_path, method: :patch, multipart: true, class: "space-y-3" do |f| %>
       <div id="bulk-song-ids"></div>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
         <% %w[artist album genre].each do |field| %>
           <div>
             <label for="bulk_<%= field %>" class="block text-xs text-gray-500 mb-1"><%= field.titleize %></label>
-            <input type="text" name="bulk[<%= field %>]" id="bulk_<%= field %>" class="w-full bg-gray-800 border border-gray-700 rounded px-2 py-1 text-gray-100 text-sm focus:outline-none focus:border-blue-500" autocomplete="off">
+            <input type="text" name="bulk[<%= field %>]" id="bulk_<%= field %>" class="w-full bg-gray-800 border border-gray-700 rounded px-2 py-1 text-gray-100 text-sm focus:outline-none focus:border-blue-500" autocomplete="off" aria-label="Update <%= field %> for selected songs" aria-describedby="bulk-description">
           </div>
         <% end %>
         <div>
           <label for="bulk_year" class="block text-xs text-gray-500 mb-1">Year</label>
-          <input type="number" name="bulk[year]" id="bulk_year" class="w-full bg-gray-800 border border-gray-700 rounded px-2 py-1 text-gray-100 text-sm focus:outline-none focus:border-blue-500" autocomplete="off">
+          <input type="number" name="bulk[year]" id="bulk_year" class="w-full bg-gray-800 border border-gray-700 rounded px-2 py-1 text-gray-100 text-sm focus:outline-none focus:border-blue-500" autocomplete="off" aria-label="Update year for selected songs" aria-describedby="bulk-description">
         </div>
       </div>
       <div>
         <label for="bulk_album_art" class="block text-xs text-gray-500 mb-1">Album Art</label>
-        <input type="file" name="bulk[album_art]" id="bulk_album_art" accept="image/*" class="text-sm text-gray-400 file:bg-gray-800 file:text-gray-300 file:border file:border-gray-700 file:rounded file:px-3 file:py-1 file:mr-3 file:cursor-pointer">
+        <input type="file" name="bulk[album_art]" id="bulk_album_art" accept="image/*" class="text-sm text-gray-400 file:bg-gray-800 file:text-gray-300 file:border file:border-gray-700 file:rounded file:px-3 file:py-1 file:mr-3 file:cursor-pointer" aria-label="Upload album art for selected songs" aria-describedby="bulk-description">
       </div>
       <div class="flex items-center gap-4">
         <button type="submit" data-action="click->multi-select#submitWithIds" class="bg-blue-600 hover:bg-blue-500 text-white text-sm px-4 py-2 rounded cursor-pointer">Apply to Selected</button>
@@ -98,17 +99,18 @@
 
   <div class="md:hidden mb-2 p-3 bg-gray-900 rounded-lg border border-gray-800">
     <label class="flex items-center gap-2 text-sm text-gray-400">
-      <input type="checkbox" data-multi-select-target="selectAll" data-action="change->multi-select#toggleAll" aria-label="Select all songs" class="rounded bg-gray-800 border-gray-700">
+      <input type="checkbox" data-multi-select-target="selectAll" data-action="change->multi-select#toggleAll" aria-label="Select all songs on this page" class="rounded bg-gray-800 border-gray-700">
       Select all
     </label>
   </div>
 
+  <% current_sort = @q.sorts.first %>
   <div class="overflow-x-auto">
   <table class="w-full text-sm text-left">
     <thead class="hidden md:table-header-group text-xs text-gray-400 uppercase bg-gray-900 border-b border-gray-800">
       <tr>
         <th scope="col" class="px-4 py-3">
-          <input type="checkbox" data-multi-select-target="selectAll" data-action="change->multi-select#toggleAll" aria-label="Select all songs" class="rounded bg-gray-800 border-gray-700">
+          <input type="checkbox" data-multi-select-target="selectAll" data-action="change->multi-select#toggleAll" aria-label="Select all songs on this page" class="rounded bg-gray-800 border-gray-700">
         </th>
         <% [
           ["title", "Title"],
@@ -119,7 +121,8 @@
           ["track_number", "Track"],
           ["disc_number", "Disc"],
         ].each do |attr, label| %>
-          <th scope="col" class="px-4 py-3">
+          <% sort_dir = current_sort&.name == attr ? (current_sort.dir == "asc" ? "ascending" : "descending") : "none" %>
+          <th scope="col" class="px-4 py-3" aria-sort="<%= sort_dir %>">
             <%= sort_link(@q, attr, label) %>
           </th>
         <% end %>

@@ -1,6 +1,6 @@
 <%= form_with(model: song, class: "space-y-4", multipart: true) do |f| %>
   <% if song.errors.any? %>
-    <div class="bg-red-900/50 text-red-300 px-4 py-2 rounded border border-red-800">
+    <div class="bg-red-900/50 text-red-300 px-4 py-2 rounded border border-red-800" role="alert">
       <ul class="list-disc list-inside">
         <% song.errors.full_messages.each do |msg| %>
           <li><%= msg %></li>
@@ -14,22 +14,42 @@
       <% %w[title artist album genre].each do |field| %>
         <div>
           <%= f.label field, class: "block text-sm text-gray-400 mb-1" %>
-          <%= f.text_field field, class: "w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-gray-100 focus:outline-none focus:border-blue-500" %>
+          <%= f.text_field field,
+            class: "w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-gray-100 focus:outline-none focus:border-blue-500",
+            **(song.errors[field].any? ? { "aria-invalid": "true", "aria-describedby": "error-#{field}" } : {}) %>
+          <% if song.errors[field].any? %>
+            <p id="error-<%= field %>" class="text-red-400 text-xs mt-1"><%= song.errors[field].join(", ") %></p>
+          <% end %>
         </div>
       <% end %>
 
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div>
           <%= f.label :year, class: "block text-sm text-gray-400 mb-1" %>
-          <%= f.number_field :year, class: "w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-gray-100 focus:outline-none focus:border-blue-500" %>
+          <%= f.number_field :year,
+            class: "w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-gray-100 focus:outline-none focus:border-blue-500",
+            **(song.errors[:year].any? ? { "aria-invalid": "true", "aria-describedby": "error-year" } : {}) %>
+          <% if song.errors[:year].any? %>
+            <p id="error-year" class="text-red-400 text-xs mt-1"><%= song.errors[:year].join(", ") %></p>
+          <% end %>
         </div>
         <div>
           <%= f.label :track_number, "Track", class: "block text-sm text-gray-400 mb-1" %>
-          <%= f.number_field :track_number, class: "w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-gray-100 focus:outline-none focus:border-blue-500" %>
+          <%= f.number_field :track_number,
+            class: "w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-gray-100 focus:outline-none focus:border-blue-500",
+            **(song.errors[:track_number].any? ? { "aria-invalid": "true", "aria-describedby": "error-track_number" } : {}) %>
+          <% if song.errors[:track_number].any? %>
+            <p id="error-track_number" class="text-red-400 text-xs mt-1"><%= song.errors[:track_number].join(", ") %></p>
+          <% end %>
         </div>
         <div>
           <%= f.label :disc_number, "Disc", class: "block text-sm text-gray-400 mb-1" %>
-          <%= f.number_field :disc_number, class: "w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-gray-100 focus:outline-none focus:border-blue-500" %>
+          <%= f.number_field :disc_number,
+            class: "w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-gray-100 focus:outline-none focus:border-blue-500",
+            **(song.errors[:disc_number].any? ? { "aria-invalid": "true", "aria-describedby": "error-disc_number" } : {}) %>
+          <% if song.errors[:disc_number].any? %>
+            <p id="error-disc_number" class="text-red-400 text-xs mt-1"><%= song.errors[:disc_number].join(", ") %></p>
+          <% end %>
         </div>
       </div>
     </div>
@@ -39,7 +59,7 @@
       <% if song.persisted? && song.album_art %>
         <%= image_tag album_art_song_path(song), alt: "Album art for #{song.title} by #{song.artist}", class: "w-32 h-32 lg:w-48 lg:h-48 object-cover rounded mb-2" %>
       <% end %>
-      <%= f.file_field :album_art, accept: "image/*", class: "text-sm text-gray-400 file:bg-gray-800 file:text-gray-300 file:border file:border-gray-700 file:rounded file:px-3 file:py-1 file:mr-3 file:cursor-pointer" %>
+      <%= f.file_field :album_art, accept: "image/*", class: "text-sm text-gray-400 file:bg-gray-800 file:text-gray-300 file:border file:border-gray-700 file:rounded file:px-3 file:py-1 file:mr-3 file:cursor-pointer", "aria-label": "Upload album art image" %>
     </div>
   </div>
 

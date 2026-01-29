@@ -7,42 +7,49 @@
     <input type="checkbox" value="<%= song.id %>" data-multi-select-target="checkbox" data-action="change->multi-select#toggle" aria-label="Select <%= song.title %>" class="rounded bg-gray-800 border-gray-700">
   </td>
   <td class="block md:table-cell pl-9 md:pl-4 md:px-4 md:py-3 font-medium text-gray-100 cursor-pointer"
+      tabindex="0" role="button"
       data-controller="inline-edit"
       data-inline-edit-url-value="<%= song_path(song) %>"
       data-inline-edit-field-value="title">
     <%= song.title %>
   </td>
   <td class="block md:table-cell pl-9 md:pl-4 md:px-4 md:py-3 text-sm md:text-base text-gray-400 md:text-gray-300 cursor-pointer"
+      tabindex="0" role="button"
       data-controller="inline-edit"
       data-inline-edit-url-value="<%= song_path(song) %>"
       data-inline-edit-field-value="artist">
     <%= song.artist %>
   </td>
   <td class="block md:table-cell pl-9 md:pl-4 md:px-4 md:py-3 text-sm md:text-base text-gray-500 md:text-gray-300 cursor-pointer"
+      tabindex="0" role="button"
       data-controller="inline-edit"
       data-inline-edit-url-value="<%= song_path(song) %>"
       data-inline-edit-field-value="album">
-    <%= song.album %><% if song.year.present? %><span class="md:hidden text-gray-600"> (<%= song.year %>)</span><% end %>
+    <%= song.album %><% if song.year.present? %><span class="md:hidden text-gray-500"> (<%= song.year %>)</span><% end %>
   </td>
   <td class="hidden md:table-cell md:px-4 md:py-3 text-gray-300 cursor-pointer"
+      tabindex="0" role="button"
       data-controller="inline-edit"
       data-inline-edit-url-value="<%= song_path(song) %>"
       data-inline-edit-field-value="genre">
     <%= song.genre %>
   </td>
   <td class="hidden md:table-cell md:px-4 md:py-3 text-gray-300 cursor-pointer"
+      tabindex="0" role="button"
       data-controller="inline-edit"
       data-inline-edit-url-value="<%= song_path(song) %>"
       data-inline-edit-field-value="year">
     <%= song.year %>
   </td>
   <td class="hidden md:table-cell md:px-4 md:py-3 text-gray-300 cursor-pointer"
+      tabindex="0" role="button"
       data-controller="inline-edit"
       data-inline-edit-url-value="<%= song_path(song) %>"
       data-inline-edit-field-value="track_number">
     <%= song.track_number %>
   </td>
   <td class="hidden md:table-cell md:px-4 md:py-3 text-gray-300 cursor-pointer"
+      tabindex="0" role="button"
       data-controller="inline-edit"
       data-inline-edit-url-value="<%= song_path(song) %>"
       data-inline-edit-field-value="disc_number">

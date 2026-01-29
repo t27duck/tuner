@@ -115,17 +115,37 @@ The application must maintain WCAG compliance and screen reader compatibility:
 - Modals must have `role="dialog"`, `aria-modal="true"`, and `aria-labelledby` pointing to the modal title
 - Dynamic content changes must be announced via ARIA live regions
 - Images must have descriptive alt text (e.g., album covers should include song title and artist)
+- Selection count changes announced to screen readers via `#aria-live-region`
+- Sync status bar has `aria-live="polite"` for progress announcements
 
 ### Keyboard Navigation
-- Skip link ("Skip to main content") for bypassing navigation
+- Skip link ("Skip to main content") for bypassing navigation; main content has `tabindex="-1"` for programmatic focus
 - All interactive elements must be keyboard accessible
 - Focus must be visible on all interactive elements
-- Current page indicated with `aria-current="page"` in navigation
+- Current page indicated with `aria-current="page"` in navigation and pagination
+- Context menu opens with Shift+F10 or context menu key; Escape closes it; arrow keys navigate menu items
+- Inline-editable cells are keyboard focusable (`tabindex="0"`, `role="button"`) and activate with Enter or Space
 
 ### Form Accessibility
 - All form inputs must have associated labels
-- Checkboxes must have `aria-label` describing what they select
-- Sortable table headers must indicate sort state with `aria-sort`
+- Checkboxes must have `aria-label` describing what they select (e.g., "Select all songs on this page")
+- Sortable table headers must indicate sort state with `aria-sort` (`ascending`, `descending`, or `none`)
+- Form validation errors linked to fields via `aria-invalid="true"` and `aria-describedby` pointing to error messages
+- Error summary container has `role="alert"` for immediate screen reader announcement
+- File input for album art has `aria-label="Upload album art image"`
+- Bulk update fields have `aria-describedby` linking to description "Applies to all selected songs"
+- Organize template input linked to token descriptions via `aria-describedby`
+
+### Context Menu Accessibility
+- Context menu has `role="menu"` and `aria-label="Song actions"`
+- Menu items have `role="menuitem"` with aria-labels including song title (e.g., "Edit Song Title", "Delete Song Title")
+- First menu item receives focus when menu opens
+- Arrow keys navigate between menu items
+- Escape key closes menu and returns focus to the triggering row
+
+### Color Contrast
+- Filter label text uses `text-gray-400` (not `text-gray-500`) for sufficient contrast against dark backgrounds
+- Mobile year display in song rows uses `text-gray-500` (not `text-gray-600`) for better contrast
 
 ### Landmarks and Structure
 - Main navigation must have `aria-label="Main navigation"`
