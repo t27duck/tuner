@@ -25,6 +25,19 @@ export default class extends Controller {
     this.selectAllTarget.checked = count > 0 && count === this.checkboxTargets.length
   }
 
+  submitWithIds(event) {
+    const form = event.target.closest("form")
+    form.querySelectorAll(".dynamic-ids").forEach(el => el.remove())
+    this.selectedIds.forEach(id => {
+      const input = document.createElement("input")
+      input.type = "hidden"
+      input.name = "song_ids[]"
+      input.value = id
+      input.className = "dynamic-ids"
+      form.appendChild(input)
+    })
+  }
+
   get selectedIds() {
     return this.checkboxTargets.filter(cb => cb.checked).map(cb => cb.value)
   }
