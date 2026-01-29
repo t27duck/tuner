@@ -8,7 +8,7 @@ class Song < ApplicationRecord
       pics = mp3.tag2.pictures
       if pics.any?
         _desc, data = pics.first
-        mime = data&.start_with?("\x89PNG") ? "image/png" : "image/jpeg"
+        mime = data&.start_with?("\x89PNG".b) ? "image/png" : "image/jpeg"
         return { data: data, mime_type: mime }
       end
     end

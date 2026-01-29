@@ -58,7 +58,15 @@ class SongsControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "album_art returns image when art exists" do
+    get album_art_song_url(@song)
+    assert_response :success
+    assert_includes %w[image/jpeg image/png], response.content_type
+  end
+
   test "album_art returns 404 when no art" do
+    Mp3Info.open(@song.file_path) { |mp3| mp3.tag2.remove_pictures }
+
     get album_art_song_url(@song)
     assert_response :not_found
   end
