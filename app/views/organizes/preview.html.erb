@@ -1,10 +1,11 @@
-<div class="max-w-5xl">
+<div>
   <h1 class="text-2xl font-bold mb-4">Preview Changes</h1>
   <p class="text-gray-400 text-sm mb-4">Template: <code><%= @template %></code></p>
 
   <% if @changes.empty? %>
     <p class="text-gray-500">No files would be moved.</p>
   <% else %>
+    <% prefix = @music_root.end_with?("/") ? @music_root : "#{@music_root}/" %>
     <table class="w-full text-sm text-left mb-6">
       <thead class="text-xs text-gray-400 uppercase bg-gray-900 border-b border-gray-800">
         <tr>
@@ -15,8 +16,8 @@
       <tbody>
         <% @changes.each do |change| %>
           <tr class="border-b border-gray-800">
-            <td class="px-4 py-3 text-gray-400 truncate max-w-xs"><%= change[:old_path] %></td>
-            <td class="px-4 py-3 text-green-400 truncate max-w-xs"><%= change[:new_path] %></td>
+            <td class="px-4 py-3 text-gray-400"><%= change[:old_path].delete_prefix(prefix) %></td>
+            <td class="px-4 py-3 text-green-400"><%= change[:new_path].delete_prefix(prefix) %></td>
           </tr>
         <% end %>
       </tbody>

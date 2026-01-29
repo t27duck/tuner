@@ -7,7 +7,10 @@ Rails.application.routes.draw do
   resource :sync_status, only: :create, controller: "sync_status"
   resource :bulk_update, only: :update
   resource :organize, only: %i[new create] do
-    post :preview, on: :collection
+    collection do
+      post :select
+      post :preview
+    end
   end
 
   get "up" => "rails/health#show", as: :rails_health_check

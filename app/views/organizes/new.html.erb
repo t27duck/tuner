@@ -6,7 +6,11 @@
     <code>&lt;Track&gt;</code>, <code>&lt;Track:N&gt;</code> (zero-padded), <code>&lt;Filename&gt;</code>
   </p>
 
-  <%= form_with url: preview_organize_path, method: :post, class: "space-y-4" do |f| %>
+  <% if @song_ids.present? %>
+    <p class="text-sm text-blue-400 mb-4"><%= @song_ids.size %> song(s) selected</p>
+  <% end %>
+
+  <%= form_with url: preview_organize_path, method: :post, data: { turbo: false }, class: "space-y-4" do |f| %>
     <div>
       <label for="template" class="block text-sm text-gray-400 mb-1">Path Template</label>
       <input type="text" name="template" id="template" value="<Artist>/<Album>/<Track:2> - <Title>" class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-gray-100 focus:outline-none focus:border-blue-500">
