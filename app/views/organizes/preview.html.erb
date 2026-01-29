@@ -6,22 +6,38 @@
     <p class="text-gray-500">No files would be moved.</p>
   <% else %>
     <% prefix = @music_root.end_with?("/") ? @music_root : "#{@music_root}/" %>
-    <table class="w-full text-sm text-left mb-6">
-      <thead class="text-xs text-gray-400 uppercase bg-gray-900 border-b border-gray-800">
-        <tr>
-          <th class="px-4 py-3">Current Path</th>
-          <th class="px-4 py-3">New Path</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @changes.each do |change| %>
-          <tr class="border-b border-gray-800">
-            <td class="px-4 py-3 text-gray-400"><%= change[:old_path].delete_prefix(prefix) %></td>
-            <td class="px-4 py-3 text-green-400"><%= change[:new_path].delete_prefix(prefix) %></td>
+
+    <%# Desktop table %>
+    <div class="hidden sm:block">
+      <table class="w-full text-sm text-left mb-6">
+        <thead class="text-xs text-gray-400 uppercase bg-gray-900 border-b border-gray-800">
+          <tr>
+            <th class="px-4 py-3">Current Path</th>
+            <th class="px-4 py-3">New Path</th>
           </tr>
-        <% end %>
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          <% @changes.each do |change| %>
+            <tr class="border-b border-gray-800">
+              <td class="px-4 py-3 text-gray-400"><%= change[:old_path].delete_prefix(prefix) %></td>
+              <td class="px-4 py-3 text-green-400"><%= change[:new_path].delete_prefix(prefix) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <%# Mobile card list %>
+    <div class="sm:hidden space-y-3 mb-6">
+      <% @changes.each do |change| %>
+        <div class="bg-gray-900 border border-gray-800 rounded-lg p-3 text-sm">
+          <div class="text-xs text-gray-500 mb-1">From:</div>
+          <div class="text-gray-400 break-all mb-2"><%= change[:old_path].delete_prefix(prefix) %></div>
+          <div class="text-xs text-gray-500 mb-1">To:</div>
+          <div class="text-green-400 break-all"><%= change[:new_path].delete_prefix(prefix) %></div>
+        </div>
+      <% end %>
+    </div>
 
     <%= form_with url: organize_path, method: :post do %>
       <input type="hidden" name="template" value="<%= @template %>">

@@ -9,34 +9,38 @@
     </div>
   <% end %>
 
-  <% %w[title artist album genre].each do |field| %>
-    <div>
-      <%= f.label field, class: "block text-sm text-gray-400 mb-1" %>
-      <%= f.text_field field, class: "w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-gray-100 focus:outline-none focus:border-blue-500" %>
-    </div>
-  <% end %>
+  <div class="flex flex-col lg:flex-row lg:gap-8">
+    <div class="flex-1 space-y-4">
+      <% %w[title artist album genre].each do |field| %>
+        <div>
+          <%= f.label field, class: "block text-sm text-gray-400 mb-1" %>
+          <%= f.text_field field, class: "w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-gray-100 focus:outline-none focus:border-blue-500" %>
+        </div>
+      <% end %>
 
-  <div class="grid grid-cols-3 gap-4">
-    <div>
-      <%= f.label :year, class: "block text-sm text-gray-400 mb-1" %>
-      <%= f.number_field :year, class: "w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-gray-100 focus:outline-none focus:border-blue-500" %>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div>
+          <%= f.label :year, class: "block text-sm text-gray-400 mb-1" %>
+          <%= f.number_field :year, class: "w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-gray-100 focus:outline-none focus:border-blue-500" %>
+        </div>
+        <div>
+          <%= f.label :track_number, "Track", class: "block text-sm text-gray-400 mb-1" %>
+          <%= f.number_field :track_number, class: "w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-gray-100 focus:outline-none focus:border-blue-500" %>
+        </div>
+        <div>
+          <%= f.label :disc_number, "Disc", class: "block text-sm text-gray-400 mb-1" %>
+          <%= f.number_field :disc_number, class: "w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-gray-100 focus:outline-none focus:border-blue-500" %>
+        </div>
+      </div>
     </div>
-    <div>
-      <%= f.label :track_number, "Track", class: "block text-sm text-gray-400 mb-1" %>
-      <%= f.number_field :track_number, class: "w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-gray-100 focus:outline-none focus:border-blue-500" %>
-    </div>
-    <div>
-      <%= f.label :disc_number, "Disc", class: "block text-sm text-gray-400 mb-1" %>
-      <%= f.number_field :disc_number, class: "w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-gray-100 focus:outline-none focus:border-blue-500" %>
-    </div>
-  </div>
 
-  <div>
-    <label class="block text-sm text-gray-400 mb-1">Album Art</label>
-    <% if song.persisted? && song.album_art %>
-      <%= image_tag album_art_song_path(song), alt: "Album art for #{song.title} by #{song.artist}", class: "w-32 h-32 object-cover rounded mb-2" %>
-    <% end %>
-    <%= f.file_field :album_art, accept: "image/*", class: "text-sm text-gray-400 file:bg-gray-800 file:text-gray-300 file:border file:border-gray-700 file:rounded file:px-3 file:py-1 file:mr-3 file:cursor-pointer" %>
+    <div class="mt-4 lg:mt-0 lg:w-48 lg:shrink-0">
+      <label class="block text-sm text-gray-400 mb-1">Album Art</label>
+      <% if song.persisted? && song.album_art %>
+        <%= image_tag album_art_song_path(song), alt: "Album art for #{song.title} by #{song.artist}", class: "w-32 h-32 lg:w-48 lg:h-48 object-cover rounded mb-2" %>
+      <% end %>
+      <%= f.file_field :album_art, accept: "image/*", class: "text-sm text-gray-400 file:bg-gray-800 file:text-gray-300 file:border file:border-gray-700 file:rounded file:px-3 file:py-1 file:mr-3 file:cursor-pointer" %>
+    </div>
   </div>
 
   <div class="flex gap-4 pt-2">

@@ -40,7 +40,7 @@
           <%= f.search_field :file_path_cont, class: "w-full bg-gray-800 border border-gray-700 rounded px-2 py-1 text-gray-100 text-sm focus:outline-none focus:border-blue-500", "data-action": "input->search#search" %>
         </div>
       </div>
-      <div class="flex gap-4 mt-3 text-xs text-gray-400">
+      <div class="flex flex-wrap gap-x-4 gap-y-2 mt-3 text-xs text-gray-400">
         <label class="flex items-center gap-1">
           <input type="checkbox" name="q[missing_artist]" value="1" <%= "checked" if params.dig(:q, :missing_artist) == "1" %> data-action="change->search#search" class="rounded bg-gray-800 border-gray-700">
           Missing artist
@@ -96,9 +96,16 @@
     <% end %>
   </div>
 
+  <div class="md:hidden mb-2 p-3 bg-gray-900 rounded-lg border border-gray-800">
+    <label class="flex items-center gap-2 text-sm text-gray-400">
+      <input type="checkbox" data-multi-select-target="selectAll" data-action="change->multi-select#toggleAll" aria-label="Select all songs" class="rounded bg-gray-800 border-gray-700">
+      Select all
+    </label>
+  </div>
+
   <div class="overflow-x-auto">
   <table class="w-full text-sm text-left">
-    <thead class="text-xs text-gray-400 uppercase bg-gray-900 border-b border-gray-800">
+    <thead class="hidden md:table-header-group text-xs text-gray-400 uppercase bg-gray-900 border-b border-gray-800">
       <tr>
         <th scope="col" class="px-4 py-3">
           <input type="checkbox" data-multi-select-target="selectAll" data-action="change->multi-select#toggleAll" aria-label="Select all songs" class="rounded bg-gray-800 border-gray-700">
@@ -119,29 +126,8 @@
         <th scope="col" class="px-4 py-3">Actions</th>
       </tr>
     </thead>
-    <tbody>
-      <% @songs.each do |song| %>
-        <%= tag.tr class: "border-b border-gray-800 hover:bg-gray-900/50",
-            data: { controller: "context-menu",
-                    context_menu_edit_url_value: edit_song_path(song),
-                    context_menu_delete_url_value: song_path(song),
-                    context_menu_song_title_value: song.title } do %>
-          <td class="px-4 py-3">
-            <input type="checkbox" value="<%= song.id %>" data-multi-select-target="checkbox" data-action="change->multi-select#toggle" aria-label="Select <%= song.title %>" class="rounded bg-gray-800 border-gray-700">
-          </td>
-          <% %w[title artist album genre year track_number disc_number].each do |field| %>
-            <td class="px-4 py-3 <%= field == 'title' ? 'font-medium text-gray-100' : 'text-gray-300' %> cursor-pointer"
-                data-controller="inline-edit"
-                data-inline-edit-url-value="<%= song_path(song) %>"
-                data-inline-edit-field-value="<%= field %>">
-              <%= song.send(field) %>
-            </td>
-          <% end %>
-          <td class="px-4 py-3">
-            <%= link_to "Edit", edit_song_path(song), class: "text-blue-400 hover:text-blue-300" %>
-          </td>
-        <% end %>
-      <% end %>
+    <tbody class="block md:table-row-group">
+      <%= render partial: "song_row", collection: @songs, as: :song %>
     </tbody>
   </table>
   </div>

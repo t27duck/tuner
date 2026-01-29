@@ -1,7 +1,7 @@
 <div class="max-w-2xl">
   <h1 class="text-2xl font-bold mb-4"><%= @song.title %></h1>
 
-  <dl class="grid grid-cols-2 gap-4 text-sm">
+  <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
     <% { "Artist" => @song.artist, "Album" => @song.album, "Genre" => @song.genre, "Year" => @song.year, "Track" => @song.track_number, "Disc" => @song.disc_number, "Duration" => @song.duration, "File" => @song.file_path }.each do |label, value| %>
       <dt class="text-gray-400"><%= label %></dt>
       <dd class="text-gray-100"><%= value %></dd>

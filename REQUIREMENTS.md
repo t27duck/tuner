@@ -75,6 +75,36 @@ Build a MP3 management web app to manage my local library of MP3s.
 - Responsive layout and mobile-friendly
 - Prefer blues for accent theme colors.
 
+## Responsive & Mobile Layout
+
+The application is fully responsive using Tailwind CSS breakpoints:
+
+### Songs List (Index)
+- **Desktop (md+):** Standard table with all columns visible (title, artist, album, genre, year, track, disc, actions)
+- **Mobile (<md):** Each song displays as a card with title, artist, album (with inline year). Genre, year, track, and disc columns are hidden. Checkbox is positioned top-left, edit icon top-right. Select-all appears as a separate row above the cards.
+- Table header is hidden on mobile; table body uses CSS `block`/`table-row-group` switching
+
+### Song Form (Edit/New)
+- Year/Track/Disc fields stack vertically on mobile (`grid-cols-1`), 3-column on `sm:` screens
+- File path uses `break-all` instead of `truncate` for narrow screens
+
+### Song Show
+- Definition list is single-column on mobile, two-column on `sm:` screens
+
+### Organize Preview
+- Desktop shows a table; mobile shows stacked cards with "From:" and "To:" labels and `break-all` paths
+
+### Pagination
+- Individual page numbers and gap indicators are hidden on mobile (`hidden sm:list-item`), leaving only prev/next navigation
+
+### Context Menu
+- Long-press (500ms) on touch devices triggers the context menu
+- Menu position is clamped to viewport bounds to prevent off-screen rendering
+
+### Layout
+- Reduced vertical padding on mobile (`py-4 sm:py-6`)
+- Toast notifications span full width on mobile, right-aligned on larger screens
+
 ## Accessibility
 
 The application must maintain WCAG compliance and screen reader compatibility:
