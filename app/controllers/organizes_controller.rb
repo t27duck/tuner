@@ -1,4 +1,4 @@
-class OrganizeController < ApplicationController
+class OrganizesController < ApplicationController
   def new
   end
 
