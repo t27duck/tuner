@@ -43,6 +43,20 @@ Build a MP3 management web app to manage my local library of MP3s.
 - Automatic directory creation and empty directory cleanup
 - Filename sanitization (removes illegal characters)
 
+### Upload
+- Drag-and-drop upload page for MP3 files and folders
+- Files saved to `_NEW/` directory inside the music root
+- Folder structure from dragged directories is preserved
+- Metadata extracted automatically and Song records created
+- Click-to-browse fallback via hidden file input
+- Client-side progress tracking: progress bar, counter (completed/total), scrollable message log
+- Summary shown on completion with success/failure counts
+- Path traversal prevention on server side
+- Duplicate file handling via `find_or_initialize_by` on file path
+- Real-time server broadcast via `UploadChannel` (ActionCable)
+- Non-MP3 files rejected with error response
+- Upload link in navigation bar
+
 ### Song Removal
 - Delete song from library and file permanently from disk
 

@@ -1,0 +1,49 @@
+<% content_for(:title, "Upload — Tuner") %>
+
+<div data-controller="upload" class="max-w-3xl mx-auto">
+  <h1 class="text-2xl font-bold text-gray-100 mb-6">Upload MP3 Files</h1>
+
+  <div
+    data-upload-target="dropZone"
+    data-action="dragover->upload#dragover dragenter->upload#dragenter dragleave->upload#dragleave drop->upload#drop click->upload#browse"
+    role="region"
+    aria-label="File drop zone"
+    class="border-2 border-dashed border-gray-700 rounded-lg p-12 text-center cursor-pointer transition-colors hover:border-blue-500 hover:bg-gray-900/50"
+  >
+    <svg class="mx-auto h-12 w-12 text-gray-500 mb-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 0 1-.88-7.903A5 5 0 1 1 15.9 6h.1a5 5 0 0 1 1 9.9M15 13l-3-3m0 0-3 3m3-3v12" />
+    </svg>
+    <p class="text-gray-400 text-lg mb-1">Drag &amp; drop MP3 files or folders here</p>
+    <p class="text-gray-500 text-sm">or click to browse</p>
+  </div>
+
+  <input
+    type="file"
+    data-upload-target="fileInput"
+    data-action="change->upload#fileSelected"
+    accept=".mp3,audio/mpeg"
+    multiple
+    class="hidden"
+    aria-label="Select MP3 files to upload"
+  >
+
+  <div data-upload-target="progressSection" class="hidden mt-6">
+    <div class="flex items-center justify-between mb-2">
+      <span class="text-sm text-gray-400" data-upload-target="counter">0 / 0</span>
+      <span class="text-sm text-gray-400" data-upload-target="statusText"></span>
+    </div>
+
+    <div class="w-full bg-gray-800 rounded-full h-3 overflow-hidden" role="progressbar" data-upload-target="progressBar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+      <div data-upload-target="progressFill" class="bg-blue-500 h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
+    </div>
+
+    <div
+      data-upload-target="messageLog"
+      class="mt-4 bg-gray-900 border border-gray-800 rounded-lg p-3 max-h-48 overflow-y-auto text-sm font-mono space-y-1"
+      aria-label="Upload progress log"
+      role="log"
+    ></div>
+
+    <div data-upload-target="summary" class="hidden mt-4 p-3 rounded-lg text-sm font-medium"></div>
+  </div>
+</div>

@@ -6,6 +6,7 @@ Rails.application.routes.draw do
   end
   resource :sync_status, only: :create, controller: "sync_status"
   resource :bulk_update, only: :update
+  resource :upload, only: %i[new create]
   resource :organize, only: %i[new create] do
     collection do
       post :select
