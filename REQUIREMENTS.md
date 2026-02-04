@@ -57,6 +57,24 @@ Build a MP3 management web app to manage my local library of MP3s.
 - Non-MP3 files rejected with error response
 - Upload link in navigation bar
 
+### Audio Playback
+- Persistent audio player bar fixed to bottom of screen
+- Play button on each song row to start playback
+- Queue built from current visible song list when play is triggered
+- Play/pause, next, previous track controls
+- Previous restarts current song if more than 3 seconds in, otherwise goes to previous track
+- Clickable progress bar with keyboard seeking (arrow keys, 5-second steps)
+- Volume slider and mute toggle (hidden on mobile)
+- Current time / duration display (hidden on mobile)
+- Now-playing indicator highlights the active song row
+- Player persists across Turbo navigations via `data-turbo-permanent`
+- Space key toggles play/pause globally (except in form inputs)
+- Album art thumbnail displayed in player bar
+- Song changes announced to screen readers via ARIA live region
+- Player bar has `role="region"` with `aria-label="Audio player"`
+- All player controls have appropriate `aria-label` attributes
+- Volume preference saved to localStorage
+
 ### Song Removal
 - Delete song from library and file permanently from disk
 

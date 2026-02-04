@@ -2,6 +2,7 @@ Rails.application.routes.draw do
   resources :songs, except: :new do
     member do
       get :album_art
+      get :stream
     end
   end
   resource :sync_status, only: :create, controller: "sync_status"

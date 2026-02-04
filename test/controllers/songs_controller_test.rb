@@ -64,6 +64,18 @@ class SongsControllerTest < ActionDispatch::IntegrationTest
     assert_includes %w[image/jpeg image/png], response.content_type
   end
 
+  test "stream returns audio file" do
+    get stream_song_url(@song)
+    assert_response :success
+    assert_equal "audio/mpeg", response.content_type
+  end
+
+  test "stream returns 404 for missing file" do
+    @song.update_column(:file_path, "/nonexistent/file.mp3")
+    get stream_song_url(@song)
+    assert_response :not_found
+  end
+
   test "album_art returns 404 when no art" do
     Mp3Info.open(@song.file_path) { |mp3| mp3.tag2.remove_pictures }
 

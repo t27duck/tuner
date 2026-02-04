@@ -1,5 +1,5 @@
 class SongsController < ApplicationController
-  before_action :set_song, only: %i[show edit update destroy album_art]
+  before_action :set_song, only: %i[show edit update destroy album_art stream]
 
   def index
     if params[:q] && params[:q][:file_path_cont].present?
@@ -42,6 +42,28 @@ class SongsController < ApplicationController
       send_data art[:data], type: art[:mime_type], disposition: "inline"
     else
       head :not_found
+    end
+  end
+
+  def stream
+    return head(:not_found) unless File.exist?(@song.file_path)
+
+    file_size = File.size(@song.file_path)
+    response.headers["Accept-Ranges"] = "bytes"
+
+    if request.headers["Range"]
+      ranges = request.headers["Range"].gsub("bytes=", "").split("-")
+      from = ranges[0].to_i
+      to = ranges[1]&.to_i || file_size - 1
+      length = to - from + 1
+
+      response.headers["Content-Range"] = "bytes #{from}-#{to}/#{file_size}"
+      response.headers["Content-Length"] = length.to_s
+
+      send_data IO.binread(@song.file_path, length, from),
+                type: "audio/mpeg", disposition: :inline, status: 206
+    else
+      send_file @song.file_path, type: "audio/mpeg", disposition: :inline
     end
   end
 

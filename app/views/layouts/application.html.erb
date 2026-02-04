@@ -16,7 +16,7 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="bg-gray-950 text-gray-100 min-h-screen">
+  <body class="bg-gray-950 text-gray-100 min-h-screen" data-controller="audio-player">
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:bg-blue-600 focus:text-white focus:px-4 focus:py-2 focus:rounded">Skip to main content</a>
 
     <div data-controller="sync-status">
@@ -36,9 +36,10 @@
       </div>
     </div>
 
-    <main id="main-content" tabindex="-1" class="max-w-7xl mx-auto px-4 py-4 sm:py-6">
+    <main id="main-content" tabindex="-1" class="max-w-7xl mx-auto px-4 py-4 sm:py-6" data-audio-player-target="mainContent">
       <%= yield %>
     </main>
+    <div id="audio-player-spacer" data-turbo-permanent data-audio-player-target="playerSpacer" class="hidden h-20"></div>
 
     <div id="toast-container" class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 z-50 flex flex-col gap-2" aria-live="polite">
       <% if notice %>
@@ -54,5 +55,59 @@
     </div>
 
     <div id="aria-live-region" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+    <div id="audio-player" data-turbo-permanent data-audio-player-target="playerBar"
+         class="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 z-40 transform translate-y-full transition-transform duration-300"
+         role="region" aria-label="Audio player">
+      <!-- Progress bar -->
+      <div class="w-full h-1.5 hover:h-2.5 bg-gray-800 cursor-pointer group transition-all"
+           data-audio-player-target="progressSlider"
+           data-action="click->audio-player#seek keydown->audio-player#progressKeydown"
+           role="slider" aria-label="Seek" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0"
+           tabindex="0">
+        <div data-audio-player-target="progressFill"
+             class="h-full bg-blue-500 group-hover:bg-blue-400 transition-colors pointer-events-none" style="width: 0%"></div>
+      </div>
+
+      <div class="flex items-center px-3 py-2 gap-3">
+        <!-- Left: Song info -->
+        <div class="flex items-center gap-3 min-w-0 flex-1 basis-0">
+          <img data-audio-player-target="albumArt" src="" alt="" class="w-10 h-10 rounded bg-gray-800 object-cover flex-shrink-0">
+          <div class="min-w-0">
+            <div data-audio-player-target="songTitle" class="text-sm font-medium text-gray-100 truncate"></div>
+            <div data-audio-player-target="songArtist" class="text-xs text-gray-400 truncate"></div>
+          </div>
+        </div>
+
+        <!-- Center: Controls -->
+        <div class="flex items-center gap-2 flex-shrink-0">
+          <button data-action="click->audio-player#previous" aria-label="Previous" class="text-gray-400 hover:text-white p-1">
+            <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+          </button>
+          <button data-action="click->audio-player#togglePlay" data-audio-player-target="playPauseBtn" aria-label="Play" class="text-white bg-blue-600 hover:bg-blue-500 rounded-full p-2">
+            <span data-audio-player-target="playPauseIcon"><svg class="w-5 h-5" aria-hidden="true" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7z"/></svg></span>
+          </button>
+          <button data-action="click->audio-player#next" aria-label="Next" class="text-gray-400 hover:text-white p-1">
+            <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+          </button>
+        </div>
+
+        <!-- Right: Time + Volume -->
+        <div class="flex items-center justify-end gap-3 flex-1 basis-0">
+          <span class="text-xs text-gray-400 tabular-nums hidden sm:inline">
+            <span data-audio-player-target="currentTime">0:00</span>
+            <span>/</span>
+            <span data-audio-player-target="durationDisplay">0:00</span>
+          </span>
+          <button data-action="click->audio-player#toggleMute" data-audio-player-target="muteBtn" aria-label="Mute" class="text-gray-400 hover:text-white hidden sm:block">
+            <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072M12 6l-4 4H4v4h4l4 4V6z"/></svg>
+          </button>
+          <input type="range" min="0" max="100" value="100"
+                 data-audio-player-target="volumeSlider"
+                 data-action="input->audio-player#setVolume"
+                 aria-label="Volume" class="w-20 accent-blue-500 hidden sm:block">
+        </div>
+      </div>
+    </div>
   </body>
 </html>
