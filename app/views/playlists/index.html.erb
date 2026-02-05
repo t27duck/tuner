@@ -1,0 +1,31 @@
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-2xl font-bold">Playlists</h1>
+  <%= link_to "New Playlist", new_playlist_path, class: "bg-blue-600 hover:bg-blue-500 text-white text-sm px-4 py-2 rounded" %>
+</div>
+
+<% if @playlists.any? %>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+    <% @playlists.each do |playlist| %>
+      <div class="bg-gray-900 border border-gray-800 rounded-lg p-4 hover:border-gray-700 transition-colors">
+        <div class="flex items-start justify-between mb-2">
+          <%= link_to playlist.name, playlist_path(playlist), class: "text-lg font-medium text-gray-100 hover:text-blue-400 truncate" %>
+          <button data-action="click->audio-player#playFromPlaylistCard"
+                  data-playlist-path="<%= playlist_path(playlist) %>"
+                  aria-label="Play <%= playlist.name %>"
+                  class="text-gray-400 hover:text-blue-400 ml-2 flex-shrink-0 cursor-pointer">
+            <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </button>
+        </div>
+        <p class="text-sm text-gray-400 mb-2"><%= playlist.songs.count %> <%= "song".pluralize(playlist.songs.count) %></p>
+        <% if playlist.description.present? %>
+          <p class="text-sm text-gray-500 line-clamp-2"><%= playlist.description %></p>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <div class="text-center py-12">
+    <p class="text-gray-400 mb-4">No playlists yet.</p>
+    <%= link_to "Create your first playlist", new_playlist_path, class: "text-blue-400 hover:text-blue-300" %>
+  </div>
+<% end %>

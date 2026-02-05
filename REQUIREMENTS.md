@@ -83,6 +83,46 @@ Build a MP3 management web app to manage my local library of MP3s.
 - Edit
 - Delete
 
+## Playlists
+
+### Playlist Management
+- Create, edit, and delete playlists with name (required) and optional description
+- Playlist index displays a responsive card grid (1/2/3/4 columns by breakpoint)
+- Each card shows name, song count, description snippet, and play button
+- Empty state with prompt to create first playlist
+
+### Adding Songs to Playlists
+- Context menu "Add to Playlist..." option on every song row
+- Submenu lists existing playlists and "+ New Playlist..." option
+- Bulk "Add to Playlist..." dropdown in multi-select bulk actions panel
+- Duplicate songs are silently skipped
+- Toast notification confirms additions with count
+
+### Playlist Playback
+- Songs on playlist show page use standard `data-song-*` attributes
+- Play button on each song triggers the audio player queue from visible playlist songs
+- Play button on playlist index cards links to playlist
+
+### Drag-and-Drop Reorder
+- SortableJS-powered drag-and-drop on playlist show page
+- Drag handles on each song row (desktop table and mobile cards)
+- Reorder persisted via PATCH to server
+- ARIA live region announces reorder completion
+
+### Playlist Show Page
+- Desktop: table with drag handle, title (with play button), artist, album, remove button
+- Mobile: card layout with drag handle, song info, play and remove buttons
+- Remove button deletes song from playlist (not from library)
+
+### Accessibility
+- Drag handles have `aria-label="Drag to reorder"`
+- Play buttons have `aria-label="Play [name]"`
+- Remove buttons have `aria-label="Remove [song title] from playlist"`
+- Context menu submenu uses `role="menu"` and `role="menuitem"`
+- Bulk picker dropdown uses `role="listbox"` and `role="option"`
+- Form errors displayed with `role="alert"`
+- Reorder changes announced via ARIA live region
+
 ## Search & Filtering
 
 ### Global Search

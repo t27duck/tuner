@@ -15,6 +15,14 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :playlists do
+    member do
+      patch :reorder
+      delete :remove_song
+    end
+  end
+  resource :playlist_additions, only: :create
+
   get "up" => "rails/health#show", as: :rails_health_check
 
   root "songs#index"

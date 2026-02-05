@@ -10,7 +10,26 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_27_231717) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_05_000203) do
+  create_table "playlist_songs", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "playlist_id", null: false
+    t.integer "position", null: false
+    t.integer "song_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["playlist_id", "position"], name: "index_playlist_songs_on_playlist_id_and_position"
+    t.index ["playlist_id", "song_id"], name: "index_playlist_songs_on_playlist_id_and_song_id", unique: true
+    t.index ["playlist_id"], name: "index_playlist_songs_on_playlist_id"
+    t.index ["song_id"], name: "index_playlist_songs_on_song_id"
+  end
+
+  create_table "playlists", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "songs", force: :cascade do |t|
     t.string "album"
     t.string "artist"
@@ -29,4 +48,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_27_231717) do
     t.index ["file_path"], name: "index_songs_on_file_path", unique: true
     t.index ["genre"], name: "index_songs_on_genre"
   end
+
+  add_foreign_key "playlist_songs", "playlists"
+  add_foreign_key "playlist_songs", "songs"
 end

@@ -1,0 +1,98 @@
+<div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
+  <div>
+    <h1 class="text-2xl font-bold"><%= @playlist.name %></h1>
+    <% if @playlist.description.present? %>
+      <p class="text-gray-400 mt-1"><%= @playlist.description %></p>
+    <% end %>
+    <p class="text-sm text-gray-500 mt-1"><%= @playlist.songs.count %> <%= "song".pluralize(@playlist.songs.count) %></p>
+  </div>
+  <div class="flex items-center gap-3">
+    <%= link_to "Edit", edit_playlist_path(@playlist), class: "text-blue-400 hover:text-blue-300 text-sm" %>
+    <%= button_to "Delete", playlist_path(@playlist), method: :delete, class: "text-red-400 hover:text-red-300 text-sm cursor-pointer", form: { data: { turbo_confirm: "Delete playlist \"#{@playlist.name}\"?" } } %>
+  </div>
+</div>
+
+<% if @playlist.playlist_songs.any? %>
+  <div data-controller="playlist-sort" data-playlist-sort-url-value="<%= reorder_playlist_path(@playlist) %>">
+    <%# Desktop table %>
+    <div class="hidden md:block overflow-x-auto">
+      <table class="w-full text-sm text-left">
+        <thead class="text-xs text-gray-400 uppercase bg-gray-900 border-b border-gray-800">
+          <tr>
+            <th scope="col" class="px-2 py-3 w-8"></th>
+            <th scope="col" class="px-4 py-3">Title</th>
+            <th scope="col" class="px-4 py-3">Artist</th>
+            <th scope="col" class="px-4 py-3">Album</th>
+            <th scope="col" class="px-4 py-3 w-20">Actions</th>
+          </tr>
+        </thead>
+        <tbody data-playlist-sort-target="list">
+          <% @playlist.playlist_songs.includes(:song).each do |playlist_song| %>
+            <% song = playlist_song.song %>
+            <tr data-playlist-song-id="<%= playlist_song.id %>"
+                data-song-id="<%= song.id %>"
+                data-song-title="<%= song.title %>"
+                data-song-artist="<%= song.artist %>"
+                data-song-stream-url="<%= stream_song_path(song) %>"
+                data-song-album-art-url="<%= album_art_song_path(song) %>"
+                class="border-b border-gray-800 hover:bg-gray-900/50">
+              <td class="px-2 py-3">
+                <span data-playlist-sort-target="handle" class="cursor-grab text-gray-600 hover:text-gray-400" aria-label="Drag to reorder">
+                  <svg class="w-4 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24"><path d="M3 15h18v-2H3v2zm0 4h18v-2H3v2zm0-8h18V9H3v2zm0-6v2h18V5H3z"/></svg>
+                </span>
+              </td>
+              <td class="px-4 py-3 font-medium text-gray-100">
+                <button data-action="click->audio-player#playFromRow" aria-label="Play <%= song.title %>" class="text-gray-400 hover:text-blue-400 mr-2 cursor-pointer">
+                  <svg class="w-4 h-4 inline" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                </button>
+                <%= song.title %>
+              </td>
+              <td class="px-4 py-3 text-gray-300"><%= song.artist %></td>
+              <td class="px-4 py-3 text-gray-300"><%= song.album %></td>
+              <td class="px-4 py-3">
+                <%= button_to remove_song_playlist_path(@playlist, playlist_song_id: playlist_song.id), method: :delete, class: "text-red-400 hover:text-red-300 cursor-pointer", "aria-label": "Remove #{song.title} from playlist" do %>
+                  <svg class="w-4 h-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <%# Mobile cards %>
+    <div class="md:hidden space-y-2" data-playlist-sort-target="mobileList">
+      <% @playlist.playlist_songs.includes(:song).each do |playlist_song| %>
+        <% song = playlist_song.song %>
+        <div data-playlist-song-id="<%= playlist_song.id %>"
+             data-song-id="<%= song.id %>"
+             data-song-title="<%= song.title %>"
+             data-song-artist="<%= song.artist %>"
+             data-song-stream-url="<%= stream_song_path(song) %>"
+             data-song-album-art-url="<%= album_art_song_path(song) %>"
+             class="bg-gray-900 border border-gray-800 rounded-lg p-3 relative">
+          <div class="flex items-center gap-3">
+            <span data-playlist-sort-target="handle" class="cursor-grab text-gray-600 hover:text-gray-400" aria-label="Drag to reorder">
+              <svg class="w-4 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24"><path d="M3 15h18v-2H3v2zm0 4h18v-2H3v2zm0-8h18V9H3v2zm0-6v2h18V5H3z"/></svg>
+            </span>
+            <div class="flex-1 min-w-0">
+              <div class="font-medium text-gray-100 truncate"><%= song.title %></div>
+              <div class="text-sm text-gray-400 truncate"><%= song.artist %></div>
+              <div class="text-sm text-gray-500 truncate"><%= song.album %></div>
+            </div>
+            <button data-action="click->audio-player#playFromRow" aria-label="Play <%= song.title %>" class="text-gray-400 hover:text-blue-400 cursor-pointer">
+              <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+            <%= button_to remove_song_playlist_path(@playlist, playlist_song_id: playlist_song.id), method: :delete, class: "text-red-400 hover:text-red-300 cursor-pointer", "aria-label": "Remove #{song.title} from playlist" do %>
+              <svg class="w-4 h-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% else %>
+  <div class="text-center py-12">
+    <p class="text-gray-400">This playlist is empty. Add songs from the <%= link_to "library", root_path, class: "text-blue-400 hover:text-blue-300" %>.</p>
+  </div>
+<% end %>
