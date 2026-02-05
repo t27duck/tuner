@@ -209,12 +209,6 @@ export default class extends Controller {
     this.audio.pause()
     this.audio.src = ""
     this._syncState()
-    if (this.hasPlayerBarTarget) {
-      this.playerBarTarget.classList.add("translate-y-full")
-    }
-    if (this.hasPlayerSpacerTarget) {
-      this.playerSpacerTarget.classList.add("hidden")
-    }
     this._dispatchQueueChanged()
     this._announce("Queue cleared")
   }
@@ -467,6 +461,7 @@ export default class extends Controller {
     if (this.hasAlbumArtTarget) {
       this.albumArtTarget.src = song.albumArtUrl
       this.albumArtTarget.alt = `Album art for ${song.title} by ${song.artist}`
+      this.albumArtTarget.classList.remove("hidden")
     }
   }
 

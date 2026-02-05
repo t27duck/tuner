@@ -43,7 +43,7 @@
     <main id="main-content" tabindex="-1" class="max-w-7xl mx-auto px-4 py-4 sm:py-6" data-audio-player-target="mainContent">
       <%= yield %>
     </main>
-    <div id="audio-player-spacer" data-turbo-permanent data-audio-player-target="playerSpacer" class="hidden h-20"></div>
+    <div id="audio-player-spacer" data-turbo-permanent data-audio-player-target="playerSpacer" class="h-20"></div>
 
     <div id="toast-container" class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 z-50 flex flex-col gap-2" aria-live="polite">
       <% if notice %>
@@ -61,7 +61,7 @@
     <div id="aria-live-region" aria-live="polite" aria-atomic="true" class="sr-only"></div>
 
     <div id="audio-player" data-turbo-permanent data-audio-player-target="playerBar"
-         class="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 z-40 transform translate-y-full transition-transform duration-300"
+         class="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 z-40 transition-transform duration-300"
          role="region" aria-label="Audio player">
       <!-- Progress bar -->
       <div class="w-full h-1.5 hover:h-2.5 bg-gray-800 cursor-pointer group transition-all"
@@ -76,7 +76,7 @@
       <div class="flex items-center px-3 py-2 gap-3">
         <!-- Left: Song info -->
         <div class="flex items-center gap-3 min-w-0 flex-1 basis-0">
-          <img data-audio-player-target="albumArt" src="" alt="" class="w-10 h-10 rounded bg-gray-800 object-cover flex-shrink-0">
+          <img data-audio-player-target="albumArt" src="" alt="" class="w-10 h-10 rounded bg-gray-800 object-cover flex-shrink-0 hidden">
           <div class="min-w-0">
             <div data-audio-player-target="songTitle" class="text-sm font-medium text-gray-100 truncate"></div>
             <div data-audio-player-target="songArtist" class="text-xs text-gray-400 truncate"></div>
