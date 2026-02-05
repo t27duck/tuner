@@ -43,6 +43,41 @@ export default class extends Controller {
     })
   }
 
+  playNextSelected() {
+    const songs = this._getSelectedSongData()
+    if (!songs.length) return
+    document.body.dispatchEvent(new CustomEvent("bulk:playNext", {
+      bubbles: true,
+      detail: { songs }
+    }))
+  }
+
+  addToQueueSelected() {
+    const songs = this._getSelectedSongData()
+    if (!songs.length) return
+    document.body.dispatchEvent(new CustomEvent("bulk:addToQueue", {
+      bubbles: true,
+      detail: { songs }
+    }))
+  }
+
+  _getSelectedSongData() {
+    return this.checkboxTargets
+      .filter(cb => cb.checked)
+      .map(cb => {
+        const row = cb.closest("tr[data-song-id]") || cb.closest("div[data-song-id]")
+        if (!row) return null
+        return {
+          id: row.dataset.songId,
+          title: row.dataset.songTitle,
+          artist: row.dataset.songArtist,
+          streamUrl: row.dataset.songStreamUrl,
+          albumArtUrl: row.dataset.songAlbumArtUrl
+        }
+      })
+      .filter(Boolean)
+  }
+
   get selectedIds() {
     return this.checkboxTargets.filter(cb => cb.checked).map(cb => cb.value)
   }

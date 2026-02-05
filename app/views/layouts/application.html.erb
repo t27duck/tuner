@@ -16,7 +16,8 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="bg-gray-950 text-gray-100 min-h-screen" data-controller="audio-player">
+  <body class="bg-gray-950 text-gray-100 min-h-screen" data-controller="audio-player queue-drawer"
+        data-action="context-menu:playNext->audio-player#playNext context-menu:addToQueue->audio-player#addToQueue bulk:playNext->audio-player#playNext bulk:addToQueue->audio-player#addToQueue queue-drawer:removeFromQueue->audio-player#removeFromQueue queue-drawer:reorderQueue->audio-player#reorderQueue queue-drawer:clearQueue->audio-player#clearQueue">
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:bg-blue-600 focus:text-white focus:px-4 focus:py-2 focus:rounded">Skip to main content</a>
 
     <div data-controller="sync-status">
@@ -93,8 +94,12 @@
           </button>
         </div>
 
-        <!-- Right: Time + Volume -->
+        <!-- Right: Queue + Time + Volume -->
         <div class="flex items-center justify-end gap-3 flex-1 basis-0">
+          <button data-action="click->queue-drawer#toggle" aria-label="Toggle queue" class="text-gray-400 hover:text-white relative">
+            <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h10m-10 4h6"/></svg>
+            <span data-queue-drawer-target="badge" class="hidden absolute -top-1 -right-1 bg-blue-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">0</span>
+          </button>
           <span class="text-xs text-gray-400 tabular-nums hidden sm:inline">
             <span data-audio-player-target="currentTime">0:00</span>
             <span>/</span>
@@ -107,6 +112,26 @@
                  data-audio-player-target="volumeSlider"
                  data-action="input->audio-player#setVolume"
                  aria-label="Volume" class="w-20 accent-blue-500 hidden sm:block">
+        </div>
+      </div>
+    </div>
+
+    <div id="queue-drawer" data-turbo-permanent>
+      <div data-queue-drawer-target="panel"
+           class="fixed right-0 top-0 bottom-20 w-80 bg-gray-900 border-l border-gray-800 z-30 transform translate-x-full transition-transform duration-300 flex flex-col"
+           role="dialog" aria-modal="true" aria-labelledby="queue-drawer-title" aria-hidden="true">
+        <div class="flex items-center justify-between px-4 py-3 border-b border-gray-800">
+          <h2 id="queue-drawer-title" class="text-sm font-semibold text-gray-200">Queue</h2>
+          <div class="flex items-center gap-2">
+            <button data-action="click->queue-drawer#clear" aria-label="Clear queue" class="text-xs text-gray-500 hover:text-red-400">Clear</button>
+            <button data-action="click->queue-drawer#close" aria-label="Close queue drawer" class="text-gray-500 hover:text-white">
+              <svg class="w-4 h-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+        </div>
+        <div data-queue-drawer-target="list" class="flex-1 overflow-y-auto hidden"></div>
+        <div data-queue-drawer-target="emptyState" class="flex-1 flex items-center justify-center">
+          <p class="text-sm text-gray-600">Queue is empty</p>
         </div>
       </div>
     </div>

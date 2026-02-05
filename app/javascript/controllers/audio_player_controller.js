@@ -7,7 +7,8 @@ function getPersistedState() {
     window._tunerAudio = {
       audio: new Audio(),
       queue: [],
-      currentIndex: -1
+      currentIndex: -1,
+      isExplicitQueue: false
     }
   }
   return window._tunerAudio
@@ -23,6 +24,7 @@ export default class extends Controller {
     this.audio = state.audio
     this.queue = state.queue
     this.currentIndex = state.currentIndex
+    this.isExplicitQueue = state.isExplicitQueue || false
     this.isPlaying = !this.audio.paused && !!this.audio.src
 
     // Bind audio events (remove old ones first to avoid duplicates)
@@ -85,12 +87,132 @@ export default class extends Controller {
     const row = event.currentTarget.closest("tr[data-song-id]")
     if (!row) return
 
-    this._buildQueueFromRows()
-    const songId = row.dataset.songId
-    this.currentIndex = this.queue.findIndex(s => s.id === songId)
-    if (this.currentIndex === -1) return
+    const song = {
+      id: row.dataset.songId,
+      title: row.dataset.songTitle,
+      artist: row.dataset.songArtist,
+      streamUrl: row.dataset.songStreamUrl,
+      albumArtUrl: row.dataset.songAlbumArtUrl
+    }
 
-    this._loadAndPlay(this.queue[this.currentIndex])
+    if (this.isExplicitQueue) {
+      // If there's an explicit queue, insert after current and play it
+      this.currentIndex++
+      this.queue.splice(this.currentIndex, 0, song)
+    } else {
+      // No explicit queue — just play this single song
+      this.queue = [song]
+      this.currentIndex = 0
+    }
+    this._syncState()
+    this._loadAndPlay(song)
+    if (this.isExplicitQueue) this._dispatchQueueChanged()
+  }
+
+  playNext(event) {
+    const songs = this._parseSongData(event)
+    if (!songs.length) return
+
+    this.isExplicitQueue = true
+    if (this.queue.length === 0) {
+      this.queue = songs
+      this.currentIndex = 0
+      this._syncState()
+      this._loadAndPlay(this.queue[0])
+    } else {
+      this.queue.splice(this.currentIndex + 1, 0, ...songs)
+      this._syncState()
+    }
+    this._dispatchQueueChanged()
+    this._showToast(`${songs.length === 1 ? `"${songs[0].title}"` : `${songs.length} songs`} added to play next`)
+  }
+
+  addToQueue(event) {
+    const songs = this._parseSongData(event)
+    if (!songs.length) return
+
+    this.isExplicitQueue = true
+    if (this.queue.length === 0) {
+      this.queue = songs
+      this.currentIndex = 0
+      this._syncState()
+      this._loadAndPlay(this.queue[0])
+    } else {
+      this.queue.push(...songs)
+      this._syncState()
+    }
+    this._dispatchQueueChanged()
+    this._showToast(`${songs.length === 1 ? `"${songs[0].title}"` : `${songs.length} songs`} added to queue`)
+  }
+
+  removeFromQueue(event) {
+    const index = event.detail.index
+    if (index === undefined || index === this.currentIndex) return
+    this.queue.splice(index, 1)
+    if (index < this.currentIndex) {
+      this.currentIndex--
+    }
+    this._syncState()
+    this._dispatchQueueChanged()
+  }
+
+  reorderQueue(event) {
+    const { oldIndex, newIndex } = event.detail
+    if (oldIndex === undefined || newIndex === undefined) return
+    const [moved] = this.queue.splice(oldIndex, 1)
+    this.queue.splice(newIndex, 0, moved)
+
+    if (this.currentIndex === oldIndex) {
+      this.currentIndex = newIndex
+    } else if (oldIndex < this.currentIndex && newIndex >= this.currentIndex) {
+      this.currentIndex--
+    } else if (oldIndex > this.currentIndex && newIndex <= this.currentIndex) {
+      this.currentIndex++
+    }
+    this._syncState()
+    this._dispatchQueueChanged()
+  }
+
+  clearQueue() {
+    this.queue = []
+    this.currentIndex = -1
+    this.isExplicitQueue = false
+    this.audio.pause()
+    this.audio.src = ""
+    this._syncState()
+    if (this.hasPlayerBarTarget) {
+      this.playerBarTarget.classList.add("translate-y-full")
+    }
+    if (this.hasPlayerSpacerTarget) {
+      this.playerSpacerTarget.classList.add("hidden")
+    }
+    this._dispatchQueueChanged()
+    this._announce("Queue cleared")
+  }
+
+  addPlaylistToQueue() {
+    const rows = document.querySelectorAll("tr[data-song-id], div[data-song-id]")
+    const songs = Array.from(rows).map(row => ({
+      id: row.dataset.songId,
+      title: row.dataset.songTitle,
+      artist: row.dataset.songArtist,
+      streamUrl: row.dataset.songStreamUrl,
+      albumArtUrl: row.dataset.songAlbumArtUrl
+    }))
+    if (!songs.length) return
+
+    this.isExplicitQueue = true
+    if (this.queue.length === 0) {
+      this.queue = songs
+      this.currentIndex = 0
+      this._syncState()
+      this._loadAndPlay(this.queue[0])
+    } else {
+      this.queue.push(...songs)
+      this._syncState()
+    }
+    this._dispatchQueueChanged()
+    this._showToast(`${songs.length} songs added to queue`)
   }
 
   togglePlay() {
@@ -108,6 +230,7 @@ export default class extends Controller {
       this.currentIndex++
       this._syncState()
       this._loadAndPlay(this.queue[this.currentIndex])
+      if (this.isExplicitQueue) this._dispatchQueueChanged()
     }
   }
 
@@ -119,6 +242,7 @@ export default class extends Controller {
       this.currentIndex--
       this._syncState()
       this._loadAndPlay(this.queue[this.currentIndex])
+      if (this.isExplicitQueue) this._dispatchQueueChanged()
     } else {
       this.audio.currentTime = 0
     }
@@ -163,18 +287,7 @@ export default class extends Controller {
     const state = getPersistedState()
     state.queue = this.queue
     state.currentIndex = this.currentIndex
-  }
-
-  _buildQueueFromRows() {
-    const rows = document.querySelectorAll("tr[data-song-id]")
-    this.queue = Array.from(rows).map(row => ({
-      id: row.dataset.songId,
-      title: row.dataset.songTitle,
-      artist: row.dataset.songArtist,
-      streamUrl: row.dataset.songStreamUrl,
-      albumArtUrl: row.dataset.songAlbumArtUrl
-    }))
-    this._syncState()
+    state.isExplicitQueue = this.isExplicitQueue
   }
 
   _loadAndPlay(song) {
@@ -184,6 +297,31 @@ export default class extends Controller {
     this._updatePlayerDisplay(song)
     this._updateNowPlayingRow()
     this._announce(`Now playing: ${song.title} by ${song.artist}`)
+  }
+
+  _parseSongData(event) {
+    const detail = event.detail || {}
+    if (detail.songs) return detail.songs
+    if (detail.song) return [detail.song]
+    return []
+  }
+
+  _dispatchQueueChanged() {
+    this.element.dispatchEvent(new CustomEvent("audio-player:queueChanged", {
+      bubbles: true,
+      detail: { queue: this.queue, currentIndex: this.currentIndex }
+    }))
+  }
+
+  _showToast(message) {
+    const container = document.getElementById("toast-container")
+    if (!container) return
+    const toast = document.createElement("div")
+    toast.setAttribute("data-controller", "toast")
+    toast.className = "px-4 py-2 bg-green-900/80 text-green-300 rounded border border-green-800 shadow-lg transition-all duration-300"
+    toast.textContent = message
+    container.appendChild(toast)
+    this._announce(message)
   }
 
   _showPlayer() {

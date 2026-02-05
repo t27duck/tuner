@@ -75,6 +75,28 @@ export default class extends Controller {
     editLink.setAttribute("aria-label", `Edit ${this.songTitleValue}`)
     menu.appendChild(editLink)
 
+    // Play Next
+    const playNextBtn = document.createElement("button")
+    playNextBtn.textContent = "Play Next"
+    playNextBtn.className = "block w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
+    playNextBtn.setAttribute("role", "menuitem")
+    playNextBtn.setAttribute("aria-label", `Play ${this.songTitleValue} next`)
+    playNextBtn.addEventListener("click", () => {
+      this._queueAction("context-menu:playNext")
+    })
+    menu.appendChild(playNextBtn)
+
+    // Add to Queue
+    const addToQueueBtn = document.createElement("button")
+    addToQueueBtn.textContent = "Add to Queue"
+    addToQueueBtn.className = "block w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
+    addToQueueBtn.setAttribute("role", "menuitem")
+    addToQueueBtn.setAttribute("aria-label", `Add ${this.songTitleValue} to queue`)
+    addToQueueBtn.addEventListener("click", () => {
+      this._queueAction("context-menu:addToQueue")
+    })
+    menu.appendChild(addToQueueBtn)
+
     // Add to Playlist
     if (this.hasSongIdValue) {
       const playlistBtn = document.createElement("button")
@@ -252,6 +274,22 @@ export default class extends Controller {
         headers: { "X-CSRF-Token": token, "Accept": "text/vnd.turbo-stream.html" }
       }).then(() => window.location.reload())
     }
+  }
+
+  _queueAction(eventName) {
+    const row = this.element.closest("tr[data-song-id]") || this.element.closest("div[data-song-id]") || this.element
+    const song = {
+      id: row.dataset.songId,
+      title: row.dataset.songTitle,
+      artist: row.dataset.songArtist,
+      streamUrl: row.dataset.songStreamUrl,
+      albumArtUrl: row.dataset.songAlbumArtUrl
+    }
+    document.body.dispatchEvent(new CustomEvent(eventName, {
+      bubbles: true,
+      detail: { songs: [song] }
+    }))
+    this.hide()
   }
 
   hide() {

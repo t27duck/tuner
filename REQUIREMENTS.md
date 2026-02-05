@@ -75,12 +75,38 @@ Build a MP3 management web app to manage my local library of MP3s.
 - All player controls have appropriate `aria-label` attributes
 - Volume preference saved to localStorage
 
+### Queue Management
+- "Play Next" inserts song(s) after the currently playing track; starts playback if queue is empty
+- "Add to Queue" appends song(s) to the end of the queue; starts playback if queue is empty
+- Queue drawer panel slides in from the right side, showing all queued songs
+- Currently playing song highlighted in the queue with "Playing" indicator
+- Drag-and-drop reorder of queued songs via SortableJS
+- Remove individual songs from queue (except the currently playing song)
+- "Clear" button empties the queue and hides the player
+- Queue toggle button in player bar with badge showing queue count
+- Queue drawer uses `role="dialog"`, `aria-modal="true"`, and `aria-labelledby`
+- Escape key closes the queue drawer
+- Toast notifications confirm queue actions
+- Queue drawer persists across Turbo navigations via `data-turbo-permanent`
+
+#### Context Menu Queue Actions
+- "Play Next" and "Add to Queue" options in the right-click context menu for every song
+
+#### Bulk Queue Actions
+- "Play Next" and "Add to Queue" buttons in the multi-select bulk actions panel on the songs page
+
+#### Playlist Queue Actions
+- "Add to Queue" button on playlist show page appends all playlist songs to the queue
+
 ### Song Removal
 - Delete song from library and file permanently from disk
 
 ### Context Menu
 - Right-click on any song for quick actions
 - Edit
+- Play Next
+- Add to Queue
+- Add to Playlist...
 - Delete
 
 ## Playlists

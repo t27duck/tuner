@@ -102,6 +102,10 @@
         <button type="button" data-action="click->playlist-picker#createNew" class="block w-full text-left px-4 py-2 text-sm text-blue-400 hover:bg-gray-700 border-t border-gray-700" role="option">+ New Playlist...</button>
       </div>
     </div>
+    <div class="mt-3 pt-3 border-t border-gray-800 flex gap-3">
+      <button type="button" data-action="click->multi-select#playNextSelected" class="text-blue-400 hover:text-blue-300 text-sm cursor-pointer" aria-label="Play selected songs next">Play Next</button>
+      <button type="button" data-action="click->multi-select#addToQueueSelected" class="text-blue-400 hover:text-blue-300 text-sm cursor-pointer" aria-label="Add selected songs to queue">Add to Queue</button>
+    </div>
   </div>
 
   <div class="md:hidden mb-2 p-3 bg-gray-900 rounded-lg border border-gray-800">
