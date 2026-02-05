@@ -25,6 +25,8 @@
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
           <a href="<%= root_path %>" class="text-xl font-bold text-blue-400 hover:text-blue-300" aria-current="<%= 'page' if current_page?(root_path) %>">Tuner</a>
           <div class="flex items-center gap-4">
+            <%= link_to "Albums", albums_path, class: "text-sm text-gray-300 hover:text-blue-400 px-2 py-1.5", "aria-label": "Albums", "aria-current": ("#{'page' if request.path.start_with?('/albums')}".presence) %>
+            <%= link_to "Artists", artists_path, class: "text-sm text-gray-300 hover:text-blue-400 px-2 py-1.5", "aria-label": "Artists", "aria-current": ("#{'page' if request.path.start_with?('/artists')}".presence) %>
             <%= link_to "Playlists", playlists_path, class: "text-sm text-gray-300 hover:text-blue-400 px-2 py-1.5", "aria-label": "Playlists", "aria-current": ("#{'page' if request.path.start_with?('/playlists')}".presence) %>
             <%= link_to "Upload", new_upload_path, class: "text-sm text-gray-300 hover:text-blue-400 px-2 py-1.5", "aria-label": "Upload MP3 files" %>
             <%= button_to "Sync Library", sync_status_path, method: :post, class: "bg-blue-600 hover:bg-blue-500 text-white text-sm px-4 py-1.5 rounded cursor-pointer", "aria-label": "Sync music library", data: { sync_status_target: "button" } %>

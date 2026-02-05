@@ -255,3 +255,35 @@ The application must maintain WCAG compliance and screen reader compatibility:
 - Main navigation must have `aria-label="Main navigation"`
 - Main content area must have `id="main-content"` for skip link target
 - Panels must be marked as dialogs when open
+
+## Browse Views
+
+### Albums
+- Album index page with card grid (1/2/3/4 columns by breakpoint) showing all unique albums
+- Each card displays album art (lazy-loaded with placeholder fallback), album name, artist(s), and song count
+- Search bar with Search button and Clear link to filter albums by name
+- Pagination at 24 albums per page
+- Songs with no album grouped under "Unknown Album" (sentinel `_unknown` in URL)
+- Album show page with hero album art, album name, artist(s), song count
+- "Play All" button replaces the queue and starts playback from the first song
+- "Add to Queue" button appends all album songs to the existing queue
+- Song list ordered by disc number, track number, title
+- Desktop table and mobile card layouts with context menu support on each song
+- Now-playing highlight on the currently active song row
+
+### Artists
+- Artist index page with card grid showing all unique artists
+- Each card displays representative album art, artist name, album count, and song count
+- Search bar with Search button and Clear link to filter artists by name
+- Pagination at 24 artists per page
+- Songs with no artist grouped under "Unknown Artist" (sentinel `_unknown` in URL)
+- Artist show page with representative art, artist name, album/song counts
+- "Play All" button replaces the queue and starts playback from the first song
+- "Add to Queue" button appends all artist songs to the existing queue
+- Songs grouped by album with section headers showing album art thumbnail and album name (linked to album show page)
+- Desktop table and mobile card layouts with context menu support on each song
+- Now-playing highlight on the currently active song row
+
+### Navigation
+- Albums and Artists links in main navigation bar (between Tuner logo and Playlists)
+- `aria-current="page"` attribute on active navigation links

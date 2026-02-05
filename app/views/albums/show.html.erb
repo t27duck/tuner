@@ -1,0 +1,112 @@
+<div class="flex flex-col sm:flex-row gap-6 mb-6">
+  <div class="w-32 h-32 sm:w-40 sm:h-40 flex-shrink-0 rounded-lg overflow-hidden bg-gray-800">
+    <% if @representative_song %>
+      <img src="<%= album_art_song_path(@representative_song) %>"
+           alt="Album art for <%= @album_name %>"
+           class="w-full h-full object-cover"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="w-full h-full items-center justify-center text-gray-600" style="display:none">
+        <svg class="w-16 h-16" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z"/></svg>
+      </div>
+    <% else %>
+      <div class="w-full h-full flex items-center justify-center text-gray-600">
+        <svg class="w-16 h-16" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z"/></svg>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="flex-1">
+    <h1 class="text-2xl font-bold"><%= @album_name %></h1>
+    <% if @artists.any? %>
+      <p class="text-gray-400 mt-1"><%= @artists.join(", ") %></p>
+    <% end %>
+    <p class="text-sm text-gray-500 mt-1"><%= @song_count %> <%= "song".pluralize(@song_count) %></p>
+    <div class="flex items-center gap-3 mt-4">
+      <button type="button" data-action="click->audio-player#playAll" class="bg-blue-600 hover:bg-blue-500 text-white text-sm px-4 py-2 rounded cursor-pointer" aria-label="Play all songs">
+        <svg class="w-4 h-4 inline mr-1" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        Play All
+      </button>
+      <button type="button" data-action="click->audio-player#addPlaylistToQueue" class="text-blue-400 hover:text-blue-300 text-sm cursor-pointer" aria-label="Add all songs to queue">Add to Queue</button>
+    </div>
+  </div>
+</div>
+
+<% if @songs.any? %>
+  <%# Desktop table %>
+  <div class="hidden md:block overflow-x-auto">
+    <table class="w-full text-sm text-left">
+      <thead class="text-xs text-gray-400 uppercase bg-gray-900 border-b border-gray-800">
+        <tr>
+          <th scope="col" class="px-4 py-3 w-12">#</th>
+          <th scope="col" class="px-4 py-3">Title</th>
+          <th scope="col" class="px-4 py-3">Artist</th>
+          <th scope="col" class="px-4 py-3 w-20">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @songs.each do |song| %>
+          <tr data-controller="context-menu"
+              data-context-menu-edit-url-value="<%= edit_song_path(song) %>"
+              data-context-menu-delete-url-value="<%= song_path(song) %>"
+              data-context-menu-song-title-value="<%= song.title %>"
+              data-context-menu-song-id-value="<%= song.id %>"
+              data-song-id="<%= song.id %>"
+              data-song-title="<%= song.title %>"
+              data-song-artist="<%= song.artist %>"
+              data-song-stream-url="<%= stream_song_path(song) %>"
+              data-song-album-art-url="<%= album_art_song_path(song) %>"
+              class="border-b border-gray-800 hover:bg-gray-900/50 data-[now-playing]:bg-blue-950/30">
+            <td class="px-4 py-3 text-gray-500"><%= song.track_number %></td>
+            <td class="px-4 py-3 font-medium text-gray-100">
+              <button data-action="click->audio-player#playFromRow" aria-label="Play <%= song.title %>" class="text-gray-400 hover:text-blue-400 mr-2 cursor-pointer">
+                <svg class="w-4 h-4 inline" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              </button>
+              <%= song.title %>
+            </td>
+            <td class="px-4 py-3 text-gray-300"><%= song.artist %></td>
+            <td class="px-4 py-3">
+              <%= link_to edit_song_path(song), class: "text-blue-400 hover:text-blue-300", "aria-label": "Edit #{song.title}" do %>
+                <svg class="w-4 h-4 inline" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <%# Mobile cards %>
+  <div class="md:hidden space-y-2">
+    <% @songs.each do |song| %>
+      <div data-controller="context-menu"
+           data-context-menu-edit-url-value="<%= edit_song_path(song) %>"
+           data-context-menu-delete-url-value="<%= song_path(song) %>"
+           data-context-menu-song-title-value="<%= song.title %>"
+           data-context-menu-song-id-value="<%= song.id %>"
+           data-song-id="<%= song.id %>"
+           data-song-title="<%= song.title %>"
+           data-song-artist="<%= song.artist %>"
+           data-song-stream-url="<%= stream_song_path(song) %>"
+           data-song-album-art-url="<%= album_art_song_path(song) %>"
+           class="bg-gray-900 border border-gray-800 rounded-lg p-3 data-[now-playing]:bg-blue-950/30">
+        <div class="flex items-center gap-3">
+          <span class="text-sm text-gray-500 w-6 text-right flex-shrink-0"><%= song.track_number %></span>
+          <div class="flex-1 min-w-0">
+            <div class="font-medium text-gray-100 truncate"><%= song.title %></div>
+            <div class="text-sm text-gray-400 truncate"><%= song.artist %></div>
+          </div>
+          <button data-action="click->audio-player#playFromRow" aria-label="Play <%= song.title %>" class="text-gray-400 hover:text-blue-400 cursor-pointer">
+            <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </button>
+          <%= link_to edit_song_path(song), class: "text-blue-400 hover:text-blue-300", "aria-label": "Edit #{song.title}" do %>
+            <svg class="w-4 h-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <div class="text-center py-12">
+    <p class="text-gray-400">No songs in this album.</p>
+  </div>
+<% end %>

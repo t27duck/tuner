@@ -219,9 +219,30 @@ export default class extends Controller {
     this._announce("Queue cleared")
   }
 
+  playAll() {
+    const rows = document.querySelectorAll("tr[data-song-id], div[data-song-id]")
+    const songs = Array.from(rows).filter(row => row.offsetParent !== null).map(row => ({
+      id: row.dataset.songId,
+      title: row.dataset.songTitle,
+      artist: row.dataset.songArtist,
+      streamUrl: row.dataset.songStreamUrl,
+      albumArtUrl: row.dataset.songAlbumArtUrl
+    }))
+    if (!songs.length) return
+
+    this.isExplicitQueue = true
+    this.queue = songs
+    this.currentIndex = 0
+    this._regenerateShuffleOrder()
+    this._syncState()
+    this._loadAndPlay(this.queue[0])
+    this._dispatchQueueChanged()
+    this._announce("Playing all songs")
+  }
+
   addPlaylistToQueue() {
     const rows = document.querySelectorAll("tr[data-song-id], div[data-song-id]")
-    const songs = Array.from(rows).map(row => ({
+    const songs = Array.from(rows).filter(row => row.offsetParent !== null).map(row => ({
       id: row.dataset.songId,
       title: row.dataset.songTitle,
       artist: row.dataset.songArtist,

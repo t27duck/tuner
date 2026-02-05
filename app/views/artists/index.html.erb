@@ -1,0 +1,49 @@
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-2xl font-bold">Artists</h1>
+  <span class="text-gray-400 text-sm"><%= @artists.total_count %> artists</span>
+</div>
+
+<div class="mb-6">
+  <%= form_with url: artists_path, method: :get, class: "flex gap-3", data: { turbo_action: "replace" } do %>
+    <div class="flex-1">
+      <input type="search" name="q" value="<%= params[:q] %>" placeholder="Search artists..." class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-gray-100 text-sm focus:outline-none focus:border-blue-500" aria-label="Search artists">
+    </div>
+    <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white text-sm px-4 py-2 rounded cursor-pointer" aria-label="Search">Search</button>
+    <% if params[:q].present? %>
+      <%= link_to "Clear", artists_path, class: "text-gray-400 hover:text-gray-200 text-sm px-3 py-2" %>
+    <% end %>
+  <% end %>
+</div>
+
+<% if @artists.any? %>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+    <% @artists.each do |artist| %>
+      <% artist_id = artist.artist_name == "Unknown Artist" ? "_unknown" : artist.artist_name %>
+      <%= link_to artist_path(artist_id), class: "bg-gray-900 border border-gray-800 rounded-lg overflow-hidden hover:border-gray-700 transition-colors block group" do %>
+        <div class="aspect-square bg-gray-800 relative overflow-hidden">
+          <img src="<%= album_art_song_path(artist.representative_song_id) %>"
+               alt="Representative art for <%= artist.artist_name %>"
+               loading="lazy"
+               class="w-full h-full object-cover"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="absolute inset-0 items-center justify-center bg-gray-800 text-gray-600" style="display:none">
+            <svg class="w-16 h-16" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+          </div>
+        </div>
+        <div class="p-3">
+          <div class="font-medium text-gray-100 truncate group-hover:text-blue-400"><%= artist.artist_name %></div>
+          <div class="text-sm text-gray-400">
+            <%= artist.album_count %> <%= "album".pluralize(artist.album_count) %>
+          </div>
+          <div class="text-xs text-gray-500 mt-1"><%= artist.song_count %> <%= "song".pluralize(artist.song_count) %></div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+<% else %>
+  <div class="text-center py-12">
+    <p class="text-gray-400">No artists found.</p>
+  </div>
+<% end %>
+
+<%= paginate @artists %>
