@@ -83,6 +83,9 @@
 
         <!-- Center: Controls -->
         <div class="flex items-center gap-2 flex-shrink-0">
+          <button data-action="click->audio-player#toggleShuffle" data-audio-player-target="shuffleBtn" aria-label="Shuffle" aria-pressed="false" class="text-gray-400 hover:text-white p-1">
+            <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 4l3 3-3 3M18 20l3-3-3-3M3 7h3a5 5 0 014.5 2.8M3 17h3a5 5 0 004.5-2.8M14.5 14.2A5 5 0 0119 17h2M14.5 9.8A5 5 0 0119 7h2"/></svg>
+          </button>
           <button data-action="click->audio-player#previous" aria-label="Previous" class="text-gray-400 hover:text-white p-1">
             <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
           </button>
@@ -91,6 +94,9 @@
           </button>
           <button data-action="click->audio-player#next" aria-label="Next" class="text-gray-400 hover:text-white p-1">
             <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+          </button>
+          <button data-action="click->audio-player#cycleRepeat" data-audio-player-target="repeatBtn" aria-label="Repeat: off" class="text-gray-400 hover:text-white p-1">
+            <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h12l-3-3m3 3l-3 3M20 17H8l3 3m-3-3l3-3"/></svg>
           </button>
         </div>
 

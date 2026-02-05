@@ -74,6 +74,12 @@ Build a MP3 management web app to manage my local library of MP3s.
 - Player bar has `role="region"` with `aria-label="Audio player"`
 - All player controls have appropriate `aria-label` attributes
 - Volume preference saved to localStorage
+- Shuffle mode: toggle randomizes playback order via Fisher-Yates shuffle; current song stays; reshuffles on repeat-all wrap
+- Repeat modes cycle: off → repeat-all → repeat-one; repeat-one loops the current song; repeat-all wraps queue (sequential or shuffled)
+- Shuffle button uses `aria-pressed` (true/false); repeat button `aria-label` reflects current mode
+- Shuffle and repeat preferences persist to localStorage across navigations and full reloads
+- Mode changes announced to screen readers via ARIA live region
+- Active shuffle/repeat buttons highlighted in blue; inactive in gray
 
 ### Queue Management
 - "Play Next" inserts song(s) after the currently playing track; starts playback if queue is empty

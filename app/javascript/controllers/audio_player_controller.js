@@ -8,7 +8,11 @@ function getPersistedState() {
       audio: new Audio(),
       queue: [],
       currentIndex: -1,
-      isExplicitQueue: false
+      isExplicitQueue: false,
+      shuffle: false,
+      repeatMode: "off",
+      shuffleOrder: [],
+      shufflePosition: -1
     }
   }
   return window._tunerAudio
@@ -17,7 +21,8 @@ function getPersistedState() {
 export default class extends Controller {
   static targets = ["mainContent", "playerBar", "playerSpacer", "playPauseBtn", "playPauseIcon",
                      "progressFill", "progressSlider", "currentTime", "durationDisplay",
-                     "songTitle", "songArtist", "albumArt", "volumeSlider", "muteBtn"]
+                     "songTitle", "songArtist", "albumArt", "volumeSlider", "muteBtn",
+                     "shuffleBtn", "repeatBtn"]
 
   connect() {
     const state = getPersistedState()
@@ -27,10 +32,22 @@ export default class extends Controller {
     this.isExplicitQueue = state.isExplicitQueue || false
     this.isPlaying = !this.audio.paused && !!this.audio.src
 
+    // Restore shuffle/repeat from persisted state, falling back to localStorage
+    if (state.shuffle === undefined) {
+      state.shuffle = localStorage.getItem("tuner-shuffle") === "true"
+      state.repeatMode = localStorage.getItem("tuner-repeat") || "off"
+      state.shuffleOrder = []
+      state.shufflePosition = -1
+    }
+    this.shuffle = state.shuffle
+    this.repeatMode = state.repeatMode
+    this.shuffleOrder = state.shuffleOrder
+    this.shufflePosition = state.shufflePosition
+
     // Bind audio events (remove old ones first to avoid duplicates)
     this._timeUpdate = () => this._onTimeUpdate()
     this._loadedMetadata = () => this._onLoadedMetadata()
-    this._ended = () => this.next()
+    this._ended = () => this._onEnded()
     this._play = () => this._onPlay()
     this._pause = () => this._onPause()
 
@@ -68,6 +85,10 @@ export default class extends Controller {
       this._updatePlayPauseIcon()
       if (this.audio.duration) this._onLoadedMetadata()
     }
+
+    // Restore shuffle/repeat button styling
+    this._updateShuffleBtn()
+    this._updateRepeatBtn()
   }
 
   disconnect() {
@@ -117,10 +138,12 @@ export default class extends Controller {
     if (this.queue.length === 0) {
       this.queue = songs
       this.currentIndex = 0
+      this._regenerateShuffleOrder()
       this._syncState()
       this._loadAndPlay(this.queue[0])
     } else {
       this.queue.splice(this.currentIndex + 1, 0, ...songs)
+      this._regenerateShuffleOrder()
       this._syncState()
     }
     this._dispatchQueueChanged()
@@ -135,10 +158,12 @@ export default class extends Controller {
     if (this.queue.length === 0) {
       this.queue = songs
       this.currentIndex = 0
+      this._regenerateShuffleOrder()
       this._syncState()
       this._loadAndPlay(this.queue[0])
     } else {
       this.queue.push(...songs)
+      this._regenerateShuffleOrder()
       this._syncState()
     }
     this._dispatchQueueChanged()
@@ -152,6 +177,7 @@ export default class extends Controller {
     if (index < this.currentIndex) {
       this.currentIndex--
     }
+    this._regenerateShuffleOrder()
     this._syncState()
     this._dispatchQueueChanged()
   }
@@ -169,6 +195,7 @@ export default class extends Controller {
     } else if (oldIndex > this.currentIndex && newIndex <= this.currentIndex) {
       this.currentIndex++
     }
+    this._regenerateShuffleOrder()
     this._syncState()
     this._dispatchQueueChanged()
   }
@@ -177,6 +204,8 @@ export default class extends Controller {
     this.queue = []
     this.currentIndex = -1
     this.isExplicitQueue = false
+    this.shuffleOrder = []
+    this.shufflePosition = -1
     this.audio.pause()
     this.audio.src = ""
     this._syncState()
@@ -205,10 +234,12 @@ export default class extends Controller {
     if (this.queue.length === 0) {
       this.queue = songs
       this.currentIndex = 0
+      this._regenerateShuffleOrder()
       this._syncState()
       this._loadAndPlay(this.queue[0])
     } else {
       this.queue.push(...songs)
+      this._regenerateShuffleOrder()
       this._syncState()
     }
     this._dispatchQueueChanged()
@@ -226,26 +257,60 @@ export default class extends Controller {
 
   next() {
     if (this.queue.length === 0) return
-    if (this.currentIndex < this.queue.length - 1) {
-      this.currentIndex++
-      this._syncState()
-      this._loadAndPlay(this.queue[this.currentIndex])
-      if (this.isExplicitQueue) this._dispatchQueueChanged()
+
+    if (this.shuffle) {
+      if (this.shufflePosition < this.shuffleOrder.length - 1) {
+        this.shufflePosition++
+        this.currentIndex = this.shuffleOrder[this.shufflePosition]
+      } else if (this.repeatMode === "all") {
+        this._generateShuffleOrder()
+        this.shufflePosition = 0
+        this.currentIndex = this.shuffleOrder[0]
+      } else {
+        return // end of shuffled queue, no repeat
+      }
+    } else {
+      if (this.currentIndex < this.queue.length - 1) {
+        this.currentIndex++
+      } else if (this.repeatMode === "all") {
+        this.currentIndex = 0
+      } else {
+        return // end of queue, no repeat
+      }
     }
+
+    this._syncState()
+    this._loadAndPlay(this.queue[this.currentIndex])
+    if (this.isExplicitQueue) this._dispatchQueueChanged()
   }
 
   previous() {
     if (this.queue.length === 0) return
     if (this.audio.currentTime > 3) {
       this.audio.currentTime = 0
-    } else if (this.currentIndex > 0) {
-      this.currentIndex--
-      this._syncState()
-      this._loadAndPlay(this.queue[this.currentIndex])
-      if (this.isExplicitQueue) this._dispatchQueueChanged()
-    } else {
-      this.audio.currentTime = 0
+      return
     }
+
+    if (this.shuffle) {
+      if (this.shufflePosition > 0) {
+        this.shufflePosition--
+        this.currentIndex = this.shuffleOrder[this.shufflePosition]
+      } else {
+        this.audio.currentTime = 0
+        return
+      }
+    } else {
+      if (this.currentIndex > 0) {
+        this.currentIndex--
+      } else {
+        this.audio.currentTime = 0
+        return
+      }
+    }
+
+    this._syncState()
+    this._loadAndPlay(this.queue[this.currentIndex])
+    if (this.isExplicitQueue) this._dispatchQueueChanged()
   }
 
   seek(event) {
@@ -281,6 +346,40 @@ export default class extends Controller {
     this._updateMuteIcon()
   }
 
+  toggleShuffle() {
+    this.shuffle = !this.shuffle
+    if (this.shuffle) {
+      this._generateShuffleOrder()
+      // Place current song at position 0 of shuffle order
+      if (this.currentIndex >= 0) {
+        const idx = this.shuffleOrder.indexOf(this.currentIndex)
+        if (idx > 0) {
+          this.shuffleOrder.splice(idx, 1)
+          this.shuffleOrder.unshift(this.currentIndex)
+        }
+        this.shufflePosition = 0
+      }
+    } else {
+      this.shuffleOrder = []
+      this.shufflePosition = -1
+    }
+    localStorage.setItem("tuner-shuffle", this.shuffle)
+    this._syncState()
+    this._updateShuffleBtn()
+    this._announce(`Shuffle ${this.shuffle ? "on" : "off"}`)
+  }
+
+  cycleRepeat() {
+    const modes = ["off", "all", "one"]
+    const nextIndex = (modes.indexOf(this.repeatMode) + 1) % modes.length
+    this.repeatMode = modes[nextIndex]
+    localStorage.setItem("tuner-repeat", this.repeatMode)
+    this._syncState()
+    this._updateRepeatBtn()
+    const labels = { off: "off", all: "all", one: "one" }
+    this._announce(`Repeat: ${labels[this.repeatMode]}`)
+  }
+
   // Private
 
   _syncState() {
@@ -288,6 +387,10 @@ export default class extends Controller {
     state.queue = this.queue
     state.currentIndex = this.currentIndex
     state.isExplicitQueue = this.isExplicitQueue
+    state.shuffle = this.shuffle
+    state.repeatMode = this.repeatMode
+    state.shuffleOrder = this.shuffleOrder
+    state.shufflePosition = this.shufflePosition
   }
 
   _loadAndPlay(song) {
@@ -409,6 +512,73 @@ export default class extends Controller {
     this.muteBtnTarget.querySelector("svg").innerHTML = muted ? this._mutedPath() : this._volumePath()
   }
 
+  _onEnded() {
+    if (this.repeatMode === "one") {
+      this.audio.currentTime = 0
+      this.audio.play()
+    } else {
+      this.next()
+    }
+  }
+
+  _generateShuffleOrder() {
+    // Fisher-Yates shuffle of queue indices
+    this.shuffleOrder = Array.from({ length: this.queue.length }, (_, i) => i)
+    for (let i = this.shuffleOrder.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [this.shuffleOrder[i], this.shuffleOrder[j]] = [this.shuffleOrder[j], this.shuffleOrder[i]]
+    }
+  }
+
+  _regenerateShuffleOrder() {
+    if (!this.shuffle) return
+    this._generateShuffleOrder()
+    // Keep current song at current shuffle position
+    if (this.currentIndex >= 0) {
+      const idx = this.shuffleOrder.indexOf(this.currentIndex)
+      if (idx !== this.shufflePosition && idx >= 0) {
+        // Swap current song into shufflePosition
+        const atPos = this.shuffleOrder[this.shufflePosition]
+        this.shuffleOrder[this.shufflePosition] = this.currentIndex
+        this.shuffleOrder[idx] = atPos
+      }
+    }
+  }
+
+  _updateShuffleBtn() {
+    if (!this.hasShuffleBtnTarget) return
+    if (this.shuffle) {
+      this.shuffleBtnTarget.classList.remove("text-gray-400")
+      this.shuffleBtnTarget.classList.add("text-blue-400")
+      this.shuffleBtnTarget.setAttribute("aria-pressed", "true")
+    } else {
+      this.shuffleBtnTarget.classList.remove("text-blue-400")
+      this.shuffleBtnTarget.classList.add("text-gray-400")
+      this.shuffleBtnTarget.setAttribute("aria-pressed", "false")
+    }
+  }
+
+  _updateRepeatBtn() {
+    if (!this.hasRepeatBtnTarget) return
+    const svg = this.repeatBtnTarget.querySelector("svg")
+    if (this.repeatMode === "off") {
+      this.repeatBtnTarget.classList.remove("text-blue-400")
+      this.repeatBtnTarget.classList.add("text-gray-400")
+      svg.innerHTML = this._repeatIconContent()
+      this.repeatBtnTarget.setAttribute("aria-label", "Repeat: off")
+    } else if (this.repeatMode === "all") {
+      this.repeatBtnTarget.classList.remove("text-gray-400")
+      this.repeatBtnTarget.classList.add("text-blue-400")
+      svg.innerHTML = this._repeatIconContent()
+      this.repeatBtnTarget.setAttribute("aria-label", "Repeat: all")
+    } else {
+      this.repeatBtnTarget.classList.remove("text-gray-400")
+      this.repeatBtnTarget.classList.add("text-blue-400")
+      svg.innerHTML = this._repeatOneIconContent()
+      this.repeatBtnTarget.setAttribute("aria-label", "Repeat: one")
+    }
+  }
+
   _announce(message) {
     const region = document.getElementById("aria-live-region")
     if (region) region.textContent = message
@@ -435,5 +605,13 @@ export default class extends Controller {
 
   _mutedPath() {
     return `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707A1 1 0 0112 5.586v12.828a1 1 0 01-1.707.707L5.586 15zM17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/>`
+  }
+
+  _repeatIconContent() {
+    return `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h12l-3-3m3 3l-3 3M20 17H8l3 3m-3-3l3-3"/>`
+  }
+
+  _repeatOneIconContent() {
+    return `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h12l-3-3m3 3l-3 3M20 17H8l3 3m-3-3l3-3"/><rect x="7.5" y="8" width="9" height="10" rx="2" fill="currentColor" stroke="none"/><text x="12" y="15.5" text-anchor="middle" fill="#1e293b" font-size="9" font-weight="bold" font-family="system-ui, sans-serif" stroke="none">1</text>`
   }
 }
