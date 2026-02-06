@@ -21,7 +21,7 @@ class ArtistsController < ApplicationController
   def show
     if params[:id] == UNKNOWN_SENTINEL
       @artist_name = "Unknown Artist"
-      @songs = Song.where(artist: [nil, ""]).order(:album, :disc_number, :track_number, :title)
+      @songs = Song.where(artist: [ nil, "" ]).order(:album, :disc_number, :track_number, :title)
     else
       @artist_name = params[:id]
       @songs = Song.where(artist: @artist_name).order(:album, :disc_number, :track_number, :title)

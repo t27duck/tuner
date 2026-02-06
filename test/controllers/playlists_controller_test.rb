@@ -66,7 +66,7 @@ class PlaylistsControllerTest < ActionDispatch::IntegrationTest
     song2 = Song.create!(file_path: "/tmp/pc_test2.mp3", title: "Song 2")
     ps2 = @playlist.add_song(song2)
 
-    patch reorder_playlist_url(@playlist), params: { ordered_ids: [ps2.id, ps1.id] }, as: :json
+    patch reorder_playlist_url(@playlist), params: { ordered_ids: [ ps2.id, ps1.id ] }, as: :json
     assert_response :success
 
     assert_equal 2, ps1.reload.position

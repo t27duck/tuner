@@ -66,6 +66,6 @@ class PlaylistTest < ActiveSupport::TestCase
     playlist.add_song(song2)
     playlist.add_song(song3)
 
-    assert_equal ["First", "Second", "Third"], playlist.playlist_songs.map { |ps| ps.song.title }
+    assert_equal [ "First", "Second", "Third" ], playlist.playlist_songs.map { |ps| ps.song.title }
   end
 end

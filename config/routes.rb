@@ -15,8 +15,8 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :albums, only: [:index, :show], id: /.+/
-  resources :artists, only: [:index, :show], id: /.+/
+  resources :albums, only: [ :index, :show ], id: /.+/
+  resources :artists, only: [ :index, :show ], id: /.+/
 
   resources :playlists do
     member do

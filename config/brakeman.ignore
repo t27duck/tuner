@@ -3,8 +3,20 @@
     {
       "fingerprint": "86d199e6510a69f81d90ccc01d01800990133ea32df82619702bf9536c7c5216",
       "note": "File path comes from database model set during sync, not from user input. params[:id] only used for record lookup by primary key."
+    },
+    {
+      "fingerprint": "76e8cb74ab30b053ecfda2389b2a123cf6ba7351179d75f08d438439e522a105",
+      "note": "send_file uses file_path from Song model (set during library sync), not user input. params[:id] is only used for primary key lookup."
+    },
+    {
+      "fingerprint": "cd2b7ed5cab1c9f56c21752af196c67cf55aa9e9c423f3178af8cf39857e357e",
+      "note": "Path is sanitized (.. and leading / stripped) and verified to be under the upload directory via File.realpath check."
+    },
+    {
+      "fingerprint": "b3ddda53c874d2606cc1f37feb5b172068ac3b4f0adde0927a6525a6ea3a2351",
+      "note": "Path is sanitized (.. and leading / stripped) and verified to be under the upload directory via File.realpath check."
     }
   ],
-  "updated": "2026-01-27",
+  "updated": "2026-02-05",
   "brakeman_version": "7.1.2"
 }

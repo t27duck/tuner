@@ -18,7 +18,7 @@ class SongsSystemTest < ApplicationSystemTestCase
     assert_text "Gamma Song"
 
     fill_in "Search songs...", with: "Beta"
-    sleep 0.5 # debounce
+    click_on "Search"
 
     assert_text "Beta Song"
     assert_no_text "Alpha Song"
