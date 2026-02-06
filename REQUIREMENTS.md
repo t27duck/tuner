@@ -284,6 +284,23 @@ The application must maintain WCAG compliance and screen reader compatibility:
 - Desktop table and mobile card layouts with context menu support on each song
 - Now-playing highlight on the currently active song row
 
+### Folders
+- Filesystem-driven folder browser that reads actual directory structure on disk
+- Root view (`/folders`) shows top-level contents of the music root directory
+- Subdirectory view (`/folders/:path`) shows contents of any nested directory
+- Breadcrumb navigation with chevron separators; root crumb labeled "Music"; current folder has `aria-current="page"`
+- Header shows folder name with folder and file counts
+- Subdirectories displayed as a compact list with folder icon, name, immediate child counts (subfolders, MP3 files), and chevron
+- Files section shows MP3 files in desktop table (filename, title, artist, album, actions) and mobile cards
+- Synced files (with Song records) display full metadata, play button, edit link, and context menu support
+- Unsynced files (no Song record) shown with reduced opacity and "Not synced" text
+- "Play All" and "Add to Queue" buttons shown when synced songs exist in the folder
+- Path traversal protection: `..` segments stripped, resolved path verified to stay within music root
+- Hidden directories (starting with `.`) excluded from listings
+- Empty folders show "This folder is empty." message
+- Entries sorted alphabetically (case-insensitive), directories listed before files
+- Responsive layout with desktop table and mobile card views
+
 ### Navigation
-- Albums and Artists links in main navigation bar (between Tuner logo and Playlists)
+- Albums, Artists, and Folders links in main navigation bar (between Tuner logo and Playlists)
 - `aria-current="page"` attribute on active navigation links

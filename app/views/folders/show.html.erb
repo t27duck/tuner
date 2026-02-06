@@ -1,0 +1,160 @@
+<nav aria-label="Folder breadcrumb" class="mb-4">
+  <ol class="flex items-center text-sm text-gray-400 flex-wrap gap-y-1">
+    <% @breadcrumbs.each_with_index do |crumb, index| %>
+      <% if index > 0 %>
+        <li class="mx-1.5 text-gray-600" aria-hidden="true">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </li>
+      <% end %>
+      <li>
+        <% if index == @breadcrumbs.length - 1 %>
+          <span class="text-gray-100 font-medium" aria-current="page"><%= crumb[:name] %></span>
+        <% else %>
+          <%= link_to crumb[:name], crumb[:path], class: "hover:text-blue-400 transition-colors" %>
+        <% end %>
+      </li>
+    <% end %>
+  </ol>
+</nav>
+
+<div class="mb-6">
+  <h1 class="text-2xl font-bold"><%= @breadcrumbs.last[:name] %></h1>
+  <p class="text-sm text-gray-500 mt-1">
+    <%= pluralize(@subdirectories.size, "folder") %>, <%= pluralize(@files.size, "file") %>
+  </p>
+  <% if @songs.any? %>
+    <div class="flex items-center gap-3 mt-4">
+      <button type="button" data-action="click->audio-player#playAll" class="bg-blue-600 hover:bg-blue-500 text-white text-sm px-4 py-2 rounded cursor-pointer" aria-label="Play all songs">
+        <svg class="w-4 h-4 inline mr-1" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        Play All
+      </button>
+      <button type="button" data-action="click->audio-player#addPlaylistToQueue" class="text-blue-400 hover:text-blue-300 text-sm cursor-pointer" aria-label="Add all songs to queue">Add to Queue</button>
+    </div>
+  <% end %>
+</div>
+
+<% if @subdirectories.any? %>
+  <div class="mb-6">
+    <ul class="divide-y divide-gray-800">
+      <% @subdirectories.each do |dir| %>
+        <li>
+          <% relative = @breadcrumbs.size > 1 ? @breadcrumbs[1..].map { |c| c[:name] }.join("/") + "/" + dir[:name] : dir[:name] %>
+          <%= link_to folder_path(relative), class: "flex items-center gap-3 px-3 py-3 hover:bg-gray-900 transition-colors rounded" do %>
+            <svg class="w-5 h-5 text-gray-400 flex-shrink-0" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+            <div class="flex-1 min-w-0">
+              <span class="text-gray-100 font-medium"><%= dir[:name] %></span>
+              <% counts = [] %>
+              <% counts << pluralize(dir[:subfolder_count], "folder") if dir[:subfolder_count] > 0 %>
+              <% counts << pluralize(dir[:file_count], "file") if dir[:file_count] > 0 %>
+              <% if counts.any? %>
+                <span class="text-sm text-gray-500 ml-2"><%= counts.join(", ") %></span>
+              <% end %>
+            </div>
+            <svg class="w-4 h-4 text-gray-600 flex-shrink-0" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<% if @files.any? %>
+  <%# Desktop table %>
+  <div class="hidden md:block overflow-x-auto">
+    <table class="w-full text-sm text-left">
+      <thead class="text-xs text-gray-400 uppercase bg-gray-900 border-b border-gray-800">
+        <tr>
+          <th scope="col" class="px-4 py-3">Filename</th>
+          <th scope="col" class="px-4 py-3">Title</th>
+          <th scope="col" class="px-4 py-3">Artist</th>
+          <th scope="col" class="px-4 py-3">Album</th>
+          <th scope="col" class="px-4 py-3 w-20">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @files.each do |file| %>
+          <% if file[:song] %>
+            <% song = file[:song] %>
+            <tr data-controller="context-menu"
+                data-context-menu-edit-url-value="<%= edit_song_path(song) %>"
+                data-context-menu-delete-url-value="<%= song_path(song) %>"
+                data-context-menu-song-title-value="<%= song.title %>"
+                data-context-menu-song-id-value="<%= song.id %>"
+                data-song-id="<%= song.id %>"
+                data-song-title="<%= song.title %>"
+                data-song-artist="<%= song.artist %>"
+                data-song-stream-url="<%= stream_song_path(song) %>"
+                data-song-album-art-url="<%= album_art_song_path(song) %>"
+                class="border-b border-gray-800 hover:bg-gray-900/50 data-[now-playing]:bg-blue-950/30">
+              <td class="px-4 py-3 text-gray-400 truncate max-w-xs"><%= file[:name] %></td>
+              <td class="px-4 py-3 font-medium text-gray-100">
+                <button data-action="click->audio-player#playFromRow" aria-label="Play <%= song.title %>" class="text-gray-400 hover:text-blue-400 mr-2 cursor-pointer">
+                  <svg class="w-4 h-4 inline" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                </button>
+                <%= song.title %>
+              </td>
+              <td class="px-4 py-3 text-gray-300"><%= song.artist %></td>
+              <td class="px-4 py-3 text-gray-300"><%= song.album %></td>
+              <td class="px-4 py-3">
+                <%= link_to edit_song_path(song), class: "text-blue-400 hover:text-blue-300", "aria-label": "Edit #{song.title}" do %>
+                  <svg class="w-4 h-4 inline" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                <% end %>
+              </td>
+            </tr>
+          <% else %>
+            <tr class="border-b border-gray-800 opacity-50">
+              <td class="px-4 py-3 text-gray-400 truncate max-w-xs"><%= file[:name] %></td>
+              <td colspan="3" class="px-4 py-3 text-gray-500 italic">Not synced</td>
+              <td class="px-4 py-3"></td>
+            </tr>
+          <% end %>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <%# Mobile cards %>
+  <div class="md:hidden space-y-2">
+    <% @files.each do |file| %>
+      <% if file[:song] %>
+        <% song = file[:song] %>
+        <div data-controller="context-menu"
+             data-context-menu-edit-url-value="<%= edit_song_path(song) %>"
+             data-context-menu-delete-url-value="<%= song_path(song) %>"
+             data-context-menu-song-title-value="<%= song.title %>"
+             data-context-menu-song-id-value="<%= song.id %>"
+             data-song-id="<%= song.id %>"
+             data-song-title="<%= song.title %>"
+             data-song-artist="<%= song.artist %>"
+             data-song-stream-url="<%= stream_song_path(song) %>"
+             data-song-album-art-url="<%= album_art_song_path(song) %>"
+             class="bg-gray-900 border border-gray-800 rounded-lg p-3 data-[now-playing]:bg-blue-950/30">
+          <div class="text-xs text-gray-500 truncate mb-1"><%= file[:name] %></div>
+          <div class="flex items-center gap-3">
+            <div class="flex-1 min-w-0">
+              <div class="font-medium text-gray-100 truncate"><%= song.title %></div>
+              <div class="text-sm text-gray-400 truncate"><%= song.artist %></div>
+            </div>
+            <button data-action="click->audio-player#playFromRow" aria-label="Play <%= song.title %>" class="text-gray-400 hover:text-blue-400 cursor-pointer">
+              <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+            <%= link_to edit_song_path(song), class: "text-blue-400 hover:text-blue-300", "aria-label": "Edit #{song.title}" do %>
+              <svg class="w-4 h-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+            <% end %>
+          </div>
+        </div>
+      <% else %>
+        <div class="bg-gray-900 border border-gray-800 rounded-lg p-3 opacity-50">
+          <div class="text-xs text-gray-500 truncate mb-1"><%= file[:name] %></div>
+          <div class="text-sm text-gray-500 italic">Not synced</div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>
+
+<% if @subdirectories.empty? && @files.empty? %>
+  <div class="text-center py-12">
+    <p class="text-gray-400">This folder is empty.</p>
+  </div>
+<% end %>
