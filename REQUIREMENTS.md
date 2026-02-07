@@ -304,3 +304,15 @@ The application must maintain WCAG compliance and screen reader compatibility:
 ### Navigation
 - Albums, Artists, and Folders links in main navigation bar (between Tuner logo and Playlists)
 - `aria-current="page"` attribute on active navigation links
+
+### Keyboard Shortcuts Help Modal
+- Centered modal overlay listing all keyboard shortcuts, organized by category (General, Playback, Navigation & Menus, Editing)
+- Toggled with `?` key (skipped when focus is on form inputs or contentEditable elements)
+- Keyboard icon button in navigation bar to open modal
+- Close via Escape key, `?` key (toggle), close button, or clicking the backdrop
+- Escape key uses `stopImmediatePropagation` to prevent closing other dialogs (e.g., queue drawer) simultaneously
+- Focus trap keeps Tab/Shift+Tab cycling within the modal while open
+- Previous focus restored when modal closes
+- ARIA: `role="dialog"`, `aria-modal="true"`, `aria-labelledby` pointing to title, state changes announced via `#aria-live-region`
+- Persists across Turbo navigations via `data-turbo-permanent`
+- Keys displayed as styled `<kbd>` elements

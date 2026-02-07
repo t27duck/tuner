@@ -16,7 +16,7 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="bg-gray-950 text-gray-100 min-h-screen" data-controller="audio-player queue-drawer"
+  <body class="bg-gray-950 text-gray-100 min-h-screen" data-controller="audio-player queue-drawer keyboard-shortcuts"
         data-action="context-menu:playNext->audio-player#playNext context-menu:addToQueue->audio-player#addToQueue bulk:playNext->audio-player#playNext bulk:addToQueue->audio-player#addToQueue queue-drawer:removeFromQueue->audio-player#removeFromQueue queue-drawer:reorderQueue->audio-player#reorderQueue queue-drawer:clearQueue->audio-player#clearQueue">
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:bg-blue-600 focus:text-white focus:px-4 focus:py-2 focus:rounded">Skip to main content</a>
 
@@ -30,6 +30,9 @@
             <%= link_to "Folders", folders_path, class: "text-sm text-gray-300 hover:text-blue-400 px-2 py-1.5", "aria-label": "Folders", "aria-current": ("#{'page' if request.path.start_with?('/folders')}".presence) %>
             <%= link_to "Playlists", playlists_path, class: "text-sm text-gray-300 hover:text-blue-400 px-2 py-1.5", "aria-label": "Playlists", "aria-current": ("#{'page' if request.path.start_with?('/playlists')}".presence) %>
             <%= link_to "Upload", new_upload_path, class: "text-sm text-gray-300 hover:text-blue-400 px-2 py-1.5", "aria-label": "Upload MP3 files" %>
+            <button data-action="click->keyboard-shortcuts#open" aria-label="Keyboard shortcuts" class="text-gray-300 hover:text-blue-400 p-1" type="button">
+              <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V7a1 1 0 011-1zm1 3h2m2 0h2m2 0h2m2 0h2M5 12h2m2 0h2m2 0h2m2 0h2M7 15h10"/></svg>
+            </button>
             <%= button_to "Sync Library", sync_status_path, method: :post, class: "bg-blue-600 hover:bg-blue-500 text-white text-sm px-4 py-1.5 rounded cursor-pointer", "aria-label": "Sync music library", data: { sync_status_target: "button" } %>
           </div>
         </div>
@@ -141,6 +144,94 @@
         <div data-queue-drawer-target="list" class="flex-1 overflow-y-auto hidden"></div>
         <div data-queue-drawer-target="emptyState" class="flex-1 flex items-center justify-center">
           <p class="text-sm text-gray-600">Queue is empty</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="keyboard-shortcuts-modal" data-turbo-permanent>
+      <div data-keyboard-shortcuts-target="dialog"
+           data-action="click->keyboard-shortcuts#closeOnBackdrop"
+           class="hidden fixed inset-0 z-50 flex items-center justify-center"
+           role="dialog" aria-modal="true" aria-labelledby="keyboard-shortcuts-title" aria-hidden="true">
+        <div class="absolute inset-0 bg-black/60" aria-hidden="true"></div>
+        <div data-keyboard-shortcuts-panel class="relative bg-gray-900 border border-gray-800 rounded-lg shadow-xl w-full max-w-lg mx-4 max-h-[80vh] overflow-y-auto">
+          <div class="sticky top-0 bg-gray-900 border-b border-gray-800 px-5 py-3 flex items-center justify-between z-10">
+            <h2 id="keyboard-shortcuts-title" class="text-base font-semibold text-gray-100">Keyboard Shortcuts</h2>
+            <button data-keyboard-shortcuts-target="closeBtn" data-action="click->keyboard-shortcuts#close" aria-label="Close keyboard shortcuts" class="text-gray-500 hover:text-white p-1" type="button">
+              <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <div class="px-5 py-4 space-y-5">
+            <section>
+              <h3 class="text-sm font-medium text-gray-400 uppercase tracking-wide mb-2">General</h3>
+              <dl class="space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <dt class="text-sm text-gray-300">Show keyboard shortcuts</dt>
+                  <dd><kbd class="font-mono text-xs text-gray-300 bg-gray-800 border border-gray-700 rounded px-1.5 py-0.5">?</kbd></dd>
+                </div>
+              </dl>
+            </section>
+            <section>
+              <h3 class="text-sm font-medium text-gray-400 uppercase tracking-wide mb-2">Playback</h3>
+              <dl class="space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <dt class="text-sm text-gray-300">Play / Pause</dt>
+                  <dd><kbd class="font-mono text-xs text-gray-300 bg-gray-800 border border-gray-700 rounded px-1.5 py-0.5">Space</kbd></dd>
+                </div>
+                <div class="flex items-center justify-between">
+                  <dt class="text-sm text-gray-300">Seek forward</dt>
+                  <dd><kbd class="font-mono text-xs text-gray-300 bg-gray-800 border border-gray-700 rounded px-1.5 py-0.5">&rarr;</kbd></dd>
+                </div>
+                <div class="flex items-center justify-between">
+                  <dt class="text-sm text-gray-300">Seek backward</dt>
+                  <dd><kbd class="font-mono text-xs text-gray-300 bg-gray-800 border border-gray-700 rounded px-1.5 py-0.5">&larr;</kbd></dd>
+                </div>
+              </dl>
+            </section>
+            <section>
+              <h3 class="text-sm font-medium text-gray-400 uppercase tracking-wide mb-2">Navigation & Menus</h3>
+              <dl class="space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <dt class="text-sm text-gray-300">Close dialog / menu</dt>
+                  <dd><kbd class="font-mono text-xs text-gray-300 bg-gray-800 border border-gray-700 rounded px-1.5 py-0.5">Esc</kbd></dd>
+                </div>
+                <div class="flex items-center justify-between">
+                  <dt class="text-sm text-gray-300">Navigate menu items</dt>
+                  <dd class="flex gap-1">
+                    <kbd class="font-mono text-xs text-gray-300 bg-gray-800 border border-gray-700 rounded px-1.5 py-0.5">&uarr;</kbd>
+                    <kbd class="font-mono text-xs text-gray-300 bg-gray-800 border border-gray-700 rounded px-1.5 py-0.5">&darr;</kbd>
+                  </dd>
+                </div>
+                <div class="flex items-center justify-between">
+                  <dt class="text-sm text-gray-300">Open context menu</dt>
+                  <dd><kbd class="font-mono text-xs text-gray-300 bg-gray-800 border border-gray-700 rounded px-1.5 py-0.5">Shift+F10</kbd></dd>
+                </div>
+              </dl>
+            </section>
+            <section>
+              <h3 class="text-sm font-medium text-gray-400 uppercase tracking-wide mb-2">Editing</h3>
+              <dl class="space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <dt class="text-sm text-gray-300">Start inline edit</dt>
+                  <dd class="flex gap-1">
+                    <kbd class="font-mono text-xs text-gray-300 bg-gray-800 border border-gray-700 rounded px-1.5 py-0.5">Enter</kbd>
+                    <kbd class="font-mono text-xs text-gray-300 bg-gray-800 border border-gray-700 rounded px-1.5 py-0.5">Space</kbd>
+                  </dd>
+                </div>
+                <div class="flex items-center justify-between">
+                  <dt class="text-sm text-gray-300">Save edit</dt>
+                  <dd><kbd class="font-mono text-xs text-gray-300 bg-gray-800 border border-gray-700 rounded px-1.5 py-0.5">Enter</kbd></dd>
+                </div>
+                <div class="flex items-center justify-between">
+                  <dt class="text-sm text-gray-300">Cancel edit</dt>
+                  <dd><kbd class="font-mono text-xs text-gray-300 bg-gray-800 border border-gray-700 rounded px-1.5 py-0.5">Esc</kbd></dd>
+                </div>
+              </dl>
+            </section>
+          </div>
+          <div class="border-t border-gray-800 px-5 py-3">
+            <p class="text-xs text-gray-500 text-center">Press <kbd class="font-mono text-xs text-gray-400 bg-gray-800 border border-gray-700 rounded px-1 py-0.5">?</kbd> to toggle this dialog</p>
+          </div>
         </div>
       </div>
     </div>
