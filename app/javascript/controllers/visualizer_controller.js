@@ -4,7 +4,8 @@ export default class extends Controller {
   static targets = ["canvas", "canvasContainer", "modeBtn", "activateOverlay", "emptyState"]
 
   connect() {
-    this.mode = "frequency" // "frequency" or "waveform"
+    this.modes = ["frequency", "waveform", "circular"]
+    this.mode = "frequency"
     this.animationId = null
     this.state = window._tunerAudio
 
@@ -32,15 +33,15 @@ export default class extends Controller {
   }
 
   toggleMode() {
-    if (this.mode === "frequency") {
-      this.mode = "waveform"
-      this.modeBtnTarget.textContent = "Frequency"
-      if (this.analyser) this.analyser.fftSize = 2048
-    } else {
-      this.mode = "frequency"
-      this.modeBtnTarget.textContent = "Waveform"
-      if (this.analyser) this.analyser.fftSize = 256
-    }
+    const currentIndex = this.modes.indexOf(this.mode)
+    const nextIndex = (currentIndex + 1) % this.modes.length
+    this.mode = this.modes[nextIndex]
+
+    // Button label shows the *next* mode
+    const nextLabel = this.modes[(nextIndex + 1) % this.modes.length]
+    this.modeBtnTarget.textContent = nextLabel.charAt(0).toUpperCase() + nextLabel.slice(1)
+
+    if (this.analyser) this.analyser.fftSize = this._fftSizeForMode()
   }
 
   activate() {
@@ -77,7 +78,7 @@ export default class extends Controller {
     }
 
     this.analyser = this.state._analyserNode
-    this.analyser.fftSize = this.mode === "frequency" ? 256 : 2048
+    this.analyser.fftSize = this._fftSizeForMode()
 
     // Handle suspended AudioContext
     if (this.audioContext.state === "suspended") {
@@ -123,8 +124,10 @@ export default class extends Controller {
 
     if (this.mode === "frequency") {
       this._renderFrequency(ctx)
-    } else {
+    } else if (this.mode === "waveform") {
       this._renderWaveform(ctx)
+    } else {
+      this._renderCircular(ctx)
     }
   }
 
@@ -189,6 +192,49 @@ export default class extends Controller {
     // Reset shadow
     ctx.shadowBlur = 0
     ctx.shadowColor = "transparent"
+  }
+
+  _renderCircular(ctx) {
+    const bufferLength = this.analyser.frequencyBinCount
+    const dataArray = new Uint8Array(bufferLength)
+    this.analyser.getByteFrequencyData(dataArray)
+
+    const cx = this.canvasWidth / 2
+    const cy = this.canvasHeight / 2
+    const baseRadius = Math.min(cx, cy) * 0.3
+    const maxBarHeight = Math.min(cx, cy) * 0.55
+    const barCount = 128
+    const angleStep = (Math.PI * 2) / barCount
+
+    for (let i = 0; i < barCount; i++) {
+      const value = dataArray[i]
+      const barHeight = (value / 255) * maxBarHeight
+      const angle = i * angleStep - Math.PI / 2
+
+      const x1 = cx + Math.cos(angle) * baseRadius
+      const y1 = cy + Math.sin(angle) * baseRadius
+      const x2 = cx + Math.cos(angle) * (baseRadius + barHeight)
+      const y2 = cy + Math.sin(angle) * (baseRadius + barHeight)
+
+      // Color shifts around the circle: blue-400 to blue-300
+      const t = i / barCount
+      const r = Math.round(96 + t * (51))    // 96 -> 147
+      const g = Math.round(165 + t * (32))   // 165 -> 197
+      const b = Math.round(250 + t * (3))    // 250 -> 253
+
+      ctx.strokeStyle = `rgb(${r}, ${g}, ${b})`
+      ctx.lineWidth = Math.max(2, (angleStep * baseRadius) - 1)
+      ctx.lineCap = "round"
+      ctx.beginPath()
+      ctx.moveTo(x1, y1)
+      ctx.lineTo(x2, y2)
+      ctx.stroke()
+    }
+  }
+
+  _fftSizeForMode() {
+    if (this.mode === "waveform") return 2048
+    return 256 // frequency and circular
   }
 
   _showEmpty() {
