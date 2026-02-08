@@ -108,6 +108,9 @@
 
         <!-- Right: Queue + Time + Volume -->
         <div class="flex items-center justify-end gap-3 flex-1 basis-0">
+          <a href="/visualizer" aria-label="Visualizer" class="text-gray-400 hover:text-white p-1" data-turbo-action="advance">
+            <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24"><rect x="4" y="10" width="3" height="10" rx="1"/><rect x="10.5" y="4" width="3" height="16" rx="1"/><rect x="17" y="8" width="3" height="12" rx="1"/></svg>
+          </a>
           <button data-action="click->queue-drawer#toggle" aria-label="Toggle queue" class="text-gray-400 hover:text-white relative">
             <svg class="w-5 h-5" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h10m-10 4h6"/></svg>
             <span data-queue-drawer-target="badge" class="hidden absolute -top-1 -right-1 bg-blue-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">0</span>

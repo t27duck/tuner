@@ -26,6 +26,7 @@ Rails.application.routes.draw do
     end
   end
   resource :playlist_additions, only: :create
+  resource :visualizer, only: :show
 
   get "up" => "rails/health#show", as: :rails_health_check
 

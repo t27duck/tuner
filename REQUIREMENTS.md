@@ -316,3 +316,22 @@ The application must maintain WCAG compliance and screen reader compatibility:
 - ARIA: `role="dialog"`, `aria-modal="true"`, `aria-labelledby` pointing to title, state changes announced via `#aria-live-region`
 - Persists across Turbo navigations via `data-turbo-permanent`
 - Keys displayed as styled `<kbd>` elements
+
+### Audio Visualizer
+- Full-screen visualizer at `/visualizer` using the Web Audio API
+- Fixed overlay fills screen above the persistent player bar (`fixed inset-0 bottom-20`)
+- Two visualization modes toggled via button in top bar:
+  - **Frequency bars**: `getByteFrequencyData` with `fftSize=256`, 64 vertical bars with blue gradient
+  - **Waveform**: `getByteTimeDomainData` with `fftSize=2048`, oscilloscope-style line with subtle glow
+- Canvas rendered at `devicePixelRatio` resolution for Retina sharpness
+- `requestAnimationFrame` loop paused on `visibilitychange` (hidden) and Stimulus `disconnect()`
+- Window resize recalculates canvas dimensions
+- Lazily creates `AudioContext` + `AnalyserNode`, persisted on `window._tunerAudio`
+- `createMediaElementSource` called only once (guarded); audio graph: source -> analyser -> destination
+- "Activate Audio" overlay button shown when AudioContext is suspended (no user gesture)
+- "No song playing" empty state when no audio is loaded
+- Song info shown in the persistent player bar below (not duplicated in visualizer)
+- Close button (back arrow) returns to song list
+- Equalizer icon button in player bar (right section, next to queue toggle) links to `/visualizer`
+- `role="region"` with `aria-label="Audio visualizer"` on container
+- All buttons have `aria-label` attributes; SVG icons have `aria-hidden="true"`
