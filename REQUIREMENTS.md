@@ -325,7 +325,7 @@ The application must maintain WCAG compliance and screen reader compatibility:
   - **Waveform**: `getByteTimeDomainData` with `fftSize=2048`, oscilloscope-style line with subtle glow
   - **Circular**: `getByteFrequencyData` with `fftSize=256`, 128 radial bars arranged in a circle with color shift
   - **Terrain**: Side-scroller pixel-art landscape with parallax-scrolling mountains, audio-reactive foreground terrain columns, pulsing stars and clouds
-  - **Synthwave**: Retro outrun aesthetic with neon sun (horizontal stripe gaps, bass-pulsing), mountain silhouette driven by mid-frequencies, perspective grid floor with cyan glow and bass warp, CRT scan lines
+  - **Synthwave**: Retro outrun aesthetic with neon sun (horizontal stripe gaps, bass-pulsing), twinkling stars in sky driven by treble energy, cityscape silhouette with audio-reactive neon-lit windows, mountain silhouette driven by mid-frequencies, perspective grid floor with cyan glow and bass warp, CRT scan lines
   - **Starfield**: Hyperspace warp with ~200 stars flying from central vanishing point, speed driven by overall audio energy, warp streaks with blue tint and glow on loud bass, purple-blue radial gradient background
 - Canvas rendered at `devicePixelRatio` resolution for Retina sharpness
 - `requestAnimationFrame` loop paused on `visibilitychange` (hidden) and Stimulus `disconnect()`

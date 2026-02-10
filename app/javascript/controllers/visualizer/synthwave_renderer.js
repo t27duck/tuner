@@ -2,6 +2,8 @@ export class SynthwaveRenderer {
   constructor(w, h) {
     this._gridOffset = 0
     this._dataArray = null
+    this._stars = []
+    this._buildings = []
     this.resize(w, h)
   }
 
@@ -10,6 +12,8 @@ export class SynthwaveRenderer {
   resize(w, h) {
     this._w = w
     this._h = h
+    this._generateStars(60)
+    this._generateBuildings()
   }
 
   render(ctx, analyser) {
@@ -29,6 +33,11 @@ export class SynthwaveRenderer {
     for (let i = 16; i < 64; i++) mid += this._dataArray[i]
     mid = mid / (48 * 255)
 
+    // Treble energy (bins 64-127)
+    let treble = 0
+    for (let i = 64; i < bufLen; i++) treble += this._dataArray[i]
+    treble = treble / (64 * 255)
+
     const w = this._w
     const h = this._h
     const horizon = h * 0.45
@@ -44,8 +53,14 @@ export class SynthwaveRenderer {
     ctx.fillStyle = "#0a0014"
     ctx.fillRect(0, horizon, w, h - horizon)
 
+    // Stars
+    this._drawStars(ctx, treble)
+
     // Neon sun
     this._drawSun(ctx, w, h, horizon, bass)
+
+    // Cityscape silhouette
+    this._drawBuildings(ctx, w, horizon, mid)
 
     // Mountain silhouette
     this._drawMountains(ctx, w, horizon, mid)
@@ -158,6 +173,100 @@ export class SynthwaveRenderer {
     ctx.fillStyle = "rgba(0, 0, 0, 0.12)"
     for (let y = 0; y < h; y += 3) {
       ctx.fillRect(0, y, w, 1)
+    }
+  }
+
+  _drawStars(ctx, treble) {
+    const now = Date.now()
+    for (const star of this._stars) {
+      let brightness = star.base * (0.5 + 0.5 * Math.sin(now * 0.001 * star.twinkleSpeed))
+      brightness *= (0.6 + treble * 0.8)
+      brightness = Math.min(brightness, 1)
+
+      ctx.fillStyle = `rgba(255, 255, 255, ${brightness})`
+      ctx.fillRect(star.x, star.y, 2, 2)
+
+      // Bright stars get a subtle cross glow
+      if (star.base > 0.8) {
+        const glowAlpha = brightness * 0.5
+        ctx.fillStyle = `rgba(255, 255, 255, ${glowAlpha})`
+        ctx.fillRect(star.x - 1, star.y + 0.5, 1, 1)
+        ctx.fillRect(star.x + 2, star.y + 0.5, 1, 1)
+        ctx.fillRect(star.x + 0.5, star.y - 1, 1, 1)
+        ctx.fillRect(star.x + 0.5, star.y + 2, 1, 1)
+      }
+    }
+  }
+
+  _drawBuildings(ctx, w, horizon, mid) {
+    for (const b of this._buildings) {
+      const top = horizon - b.h
+      // Building silhouette
+      ctx.fillStyle = "#0d0620"
+      ctx.fillRect(b.x, top, b.w, b.h)
+
+      // Neon outline on rooftop
+      ctx.strokeStyle = "rgba(0, 255, 242, 0.15)"
+      ctx.lineWidth = 1
+      ctx.beginPath()
+      ctx.moveTo(b.x, top)
+      ctx.lineTo(b.x + b.w, top)
+      ctx.stroke()
+
+      // Windows
+      for (const win of b.windows) {
+        // Deterministic hash to decide if lit — stable across frames
+        const hash = ((b.x * 7 + win.row * 13 + win.col * 31) & 0xff) / 255
+        const baseThreshold = 0.15
+        const lit = hash < baseThreshold + mid * 1.0
+
+        if (lit) {
+          // Occasional cyan accent window, otherwise warm yellow-orange
+          if (hash < 0.05) {
+            ctx.fillStyle = `rgba(0, 255, 242, 0.5)`
+          } else {
+            ctx.fillStyle = `rgba(255, 200, 80, ${0.7 + mid * 0.3})`
+          }
+          ctx.fillRect(b.x + win.col, top + win.row, 3, 2)
+        }
+      }
+    }
+  }
+
+  _generateStars(count) {
+    this._stars = []
+    for (let i = 0; i < count; i++) {
+      this._stars.push({
+        x: Math.random() * this._w,
+        y: Math.random() * this._h * 0.35,
+        base: 0.3 + Math.random() * 0.7,
+        twinkleSpeed: 0.5 + Math.random() * 2
+      })
+    }
+  }
+
+  _generateBuildings() {
+    this._buildings = []
+    const horizon = this._h * 0.45
+    let x = 0
+    while (x < this._w) {
+      const bw = 30 + Math.random() * 50
+      const bh = horizon * (0.15 + Math.random() * 0.30)
+      const windows = []
+
+      const marginX = 5
+      const marginTop = 4
+      const spacingX = 8
+      const spacingY = 10
+
+      for (let row = marginTop; row < bh - spacingY; row += spacingY) {
+        for (let col = marginX; col < bw - spacingX; col += spacingX) {
+          windows.push({ row, col })
+        }
+      }
+
+      this._buildings.push({ x, w: bw, h: bh, windows })
+      x += bw + Math.random() * 5
     }
   }
 }
