@@ -320,7 +320,7 @@ The application must maintain WCAG compliance and screen reader compatibility:
 ### Audio Visualizer
 - Full-screen visualizer at `/visualizer` using the Web Audio API
 - Fixed overlay fills screen above the persistent player bar (`fixed inset-0 bottom-20`)
-- Six visualization modes cycled via button in top bar:
+- Six visualization modes with left/right arrow navigation in top bar; label displays the current mode name; arrows cycle backward/forward with wraparound:
   - **Frequency bars**: `getByteFrequencyData` with `fftSize=256`, 64 vertical bars with blue gradient
   - **Waveform**: `getByteTimeDomainData` with `fftSize=2048`, oscilloscope-style line with subtle glow
   - **Circular**: `getByteFrequencyData` with `fftSize=256`, 128 radial bars arranged in a circle with color shift

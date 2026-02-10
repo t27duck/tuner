@@ -11,11 +11,23 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
       </svg>
     </a>
-    <button data-action="click->visualizer#toggleMode" data-visualizer-target="modeBtn"
-            aria-label="Switch visualization mode"
-            class="text-gray-400 hover:text-white px-3 py-1 rounded border border-gray-700 text-sm">
-      Waveform
-    </button>
+    <div class="flex items-center gap-1">
+      <button data-action="click->visualizer#prevMode" aria-label="Previous visualization mode"
+              class="text-gray-400 hover:text-white p-1">
+        <svg class="w-4 h-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </button>
+      <span data-visualizer-target="modeLabel" class="text-gray-400 text-sm min-w-[5rem] text-center">
+        Frequency
+      </span>
+      <button data-action="click->visualizer#nextMode" aria-label="Next visualization mode"
+              class="text-gray-400 hover:text-white p-1">
+        <svg class="w-4 h-4" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </button>
+    </div>
   </div>
 
   <!-- Canvas -->

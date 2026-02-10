@@ -4,7 +4,7 @@ import { SynthwaveRenderer } from "controllers/visualizer/synthwave_renderer"
 import { StarfieldRenderer } from "controllers/visualizer/starfield_renderer"
 
 export default class extends Controller {
-  static targets = ["canvas", "canvasContainer", "modeBtn", "activateOverlay", "emptyState"]
+  static targets = ["canvas", "canvasContainer", "modeLabel", "activateOverlay", "emptyState"]
 
   connect() {
     this.modes = ["frequency", "waveform", "circular", "terrain", "synthwave", "starfield"]
@@ -22,6 +22,8 @@ export default class extends Controller {
     this._initRenderers()
     this._startRendering()
 
+    this._updateModeLabel()
+
     this._boundResize = () => this._resizeCanvas()
     this._boundVisibility = () => this._onVisibilityChange()
 
@@ -36,15 +38,17 @@ export default class extends Controller {
     if (this._boundVisibility) document.removeEventListener("visibilitychange", this._boundVisibility)
   }
 
-  toggleMode() {
+  prevMode() {
     const currentIndex = this.modes.indexOf(this.mode)
-    const nextIndex = (currentIndex + 1) % this.modes.length
-    this.mode = this.modes[nextIndex]
+    this.mode = this.modes[(currentIndex - 1 + this.modes.length) % this.modes.length]
+    this._updateModeLabel()
+    if (this.analyser) this.analyser.fftSize = this._fftSizeForMode()
+  }
 
-    // Button label shows the *next* mode
-    const nextLabel = this.modes[(nextIndex + 1) % this.modes.length]
-    this.modeBtnTarget.textContent = nextLabel.charAt(0).toUpperCase() + nextLabel.slice(1)
-
+  nextMode() {
+    const currentIndex = this.modes.indexOf(this.mode)
+    this.mode = this.modes[(currentIndex + 1) % this.modes.length]
+    this._updateModeLabel()
     if (this.analyser) this.analyser.fftSize = this._fftSizeForMode()
   }
 
@@ -261,6 +265,12 @@ export default class extends Controller {
       return this._renderers[this.mode].fftSize
     }
     return 256 // frequency and circular
+  }
+
+  _updateModeLabel() {
+    if (this.hasModeLabelTarget) {
+      this.modeLabelTarget.textContent = this.mode.charAt(0).toUpperCase() + this.mode.slice(1)
+    }
   }
 
   _showEmpty() {
