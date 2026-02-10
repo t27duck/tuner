@@ -1,10 +1,12 @@
 import { Controller } from "@hotwired/stimulus"
+import { TerrainRenderer } from "controllers/visualizer/terrain_renderer"
+import { SynthwaveRenderer } from "controllers/visualizer/synthwave_renderer"
 
 export default class extends Controller {
   static targets = ["canvas", "canvasContainer", "modeBtn", "activateOverlay", "emptyState"]
 
   connect() {
-    this.modes = ["frequency", "waveform", "circular"]
+    this.modes = ["frequency", "waveform", "circular", "terrain", "synthwave"]
     this.mode = "frequency"
     this.animationId = null
     this.state = window._tunerAudio
@@ -16,6 +18,7 @@ export default class extends Controller {
 
     this._setupAudioNodes()
     this._resizeCanvas()
+    this._initRenderers()
     this._startRendering()
 
     this._boundResize = () => this._resizeCanvas()
@@ -100,6 +103,8 @@ export default class extends Controller {
 
     const ctx = this.canvasTarget.getContext("2d")
     ctx.scale(dpr, dpr)
+
+    this._resizeRenderers()
   }
 
   _startRendering() {
@@ -126,8 +131,10 @@ export default class extends Controller {
       this._renderFrequency(ctx)
     } else if (this.mode === "waveform") {
       this._renderWaveform(ctx)
-    } else {
+    } else if (this.mode === "circular") {
       this._renderCircular(ctx)
+    } else if (this._renderers && this._renderers[this.mode]) {
+      this._renderers[this.mode].render(ctx, this.analyser)
     }
   }
 
@@ -232,8 +239,25 @@ export default class extends Controller {
     }
   }
 
+  _initRenderers() {
+    this._renderers = {
+      terrain: new TerrainRenderer(this.canvasWidth, this.canvasHeight),
+      synthwave: new SynthwaveRenderer(this.canvasWidth, this.canvasHeight)
+    }
+  }
+
+  _resizeRenderers() {
+    if (!this._renderers) return
+    for (const renderer of Object.values(this._renderers)) {
+      renderer.resize(this.canvasWidth, this.canvasHeight)
+    }
+  }
+
   _fftSizeForMode() {
     if (this.mode === "waveform") return 2048
+    if (this._renderers && this._renderers[this.mode]) {
+      return this._renderers[this.mode].fftSize
+    }
     return 256 // frequency and circular
   }
 

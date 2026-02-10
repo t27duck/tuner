@@ -320,10 +320,12 @@ The application must maintain WCAG compliance and screen reader compatibility:
 ### Audio Visualizer
 - Full-screen visualizer at `/visualizer` using the Web Audio API
 - Fixed overlay fills screen above the persistent player bar (`fixed inset-0 bottom-20`)
-- Three visualization modes cycled via button in top bar:
+- Five visualization modes cycled via button in top bar:
   - **Frequency bars**: `getByteFrequencyData` with `fftSize=256`, 64 vertical bars with blue gradient
   - **Waveform**: `getByteTimeDomainData` with `fftSize=2048`, oscilloscope-style line with subtle glow
   - **Circular**: `getByteFrequencyData` with `fftSize=256`, 128 radial bars arranged in a circle with color shift
+  - **Terrain**: Side-scroller pixel-art landscape with parallax-scrolling mountains, audio-reactive foreground terrain columns, pulsing stars and clouds
+  - **Synthwave**: Retro outrun aesthetic with neon sun (horizontal stripe gaps, bass-pulsing), mountain silhouette driven by mid-frequencies, perspective grid floor with cyan glow and bass warp, CRT scan lines
 - Canvas rendered at `devicePixelRatio` resolution for Retina sharpness
 - `requestAnimationFrame` loop paused on `visibilitychange` (hidden) and Stimulus `disconnect()`
 - Window resize recalculates canvas dimensions
