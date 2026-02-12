@@ -320,13 +320,15 @@ The application must maintain WCAG compliance and screen reader compatibility:
 ### Audio Visualizer
 - Full-screen visualizer at `/visualizer` using the Web Audio API
 - Fixed overlay fills screen above the persistent player bar (`fixed inset-0 bottom-20`)
-- Six visualization modes with left/right arrow navigation in top bar; label displays the current mode name; arrows cycle backward/forward with wraparound:
+- Eight visualization modes with left/right arrow navigation in top bar; label displays the current mode name; arrows cycle backward/forward with wraparound:
   - **Frequency bars**: `getByteFrequencyData` with `fftSize=256`, 64 vertical bars with blue gradient
   - **Waveform**: `getByteTimeDomainData` with `fftSize=2048`, oscilloscope-style line with subtle glow
   - **Circular**: `getByteFrequencyData` with `fftSize=256`, 128 radial bars arranged in a circle with color shift
   - **Terrain**: Side-scroller pixel-art landscape with parallax-scrolling mountains, audio-reactive foreground terrain columns, pulsing stars and clouds
   - **Synthwave**: Retro outrun aesthetic with neon sun (horizontal stripe gaps, bass-pulsing), twinkling stars in sky driven by treble energy, cityscape silhouette with audio-reactive neon-lit windows, mountain silhouette driven by mid-frequencies, perspective grid floor with cyan glow and bass warp, CRT scan lines
   - **Starfield**: Hyperspace warp with ~200 stars flying from central vanishing point, speed driven by overall audio energy, warp streaks with blue tint and glow on loud bass, purple-blue radial gradient background
+  - **Winamp**: Classic late-90s spectrum analyzer with ~28 chunky bars using logarithmic frequency bin mapping, stacked discrete LED-like block segments with 1px gaps, green-yellow-red vertical gradient (color based on block position), peak dot indicators with gravity decay
+  - **Vectrex**: Retro vector wireframe display with phosphor persistence (fade trails), green phosphor glow, rotating 3D wireframe dodecahedron (bass drives rotation, mid drives scale, treble adds vertex sparks), orbiting wireframe debris shapes, CRT scanlines and vignette
 - Canvas rendered at `devicePixelRatio` resolution for Retina sharpness
 - `requestAnimationFrame` loop paused on `visibilitychange` (hidden) and Stimulus `disconnect()`
 - Window resize recalculates canvas dimensions

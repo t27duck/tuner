@@ -2,12 +2,14 @@ import { Controller } from "@hotwired/stimulus"
 import { TerrainRenderer } from "controllers/visualizer/terrain_renderer"
 import { SynthwaveRenderer } from "controllers/visualizer/synthwave_renderer"
 import { StarfieldRenderer } from "controllers/visualizer/starfield_renderer"
+import { WinampRenderer } from "controllers/visualizer/winamp_renderer"
+import { VectrexRenderer } from "controllers/visualizer/vectrex_renderer"
 
 export default class extends Controller {
   static targets = ["canvas", "canvasContainer", "modeLabel", "activateOverlay", "emptyState"]
 
   connect() {
-    this.modes = ["frequency", "waveform", "circular", "terrain", "synthwave", "starfield"]
+    this.modes = ["frequency", "waveform", "circular", "terrain", "synthwave", "starfield", "winamp", "vectrex"]
     this.mode = "frequency"
     this.animationId = null
     this.state = window._tunerAudio
@@ -248,7 +250,9 @@ export default class extends Controller {
     this._renderers = {
       terrain: new TerrainRenderer(this.canvasWidth, this.canvasHeight),
       synthwave: new SynthwaveRenderer(this.canvasWidth, this.canvasHeight),
-      starfield: new StarfieldRenderer(this.canvasWidth, this.canvasHeight)
+      starfield: new StarfieldRenderer(this.canvasWidth, this.canvasHeight),
+      winamp: new WinampRenderer(this.canvasWidth, this.canvasHeight),
+      vectrex: new VectrexRenderer(this.canvasWidth, this.canvasHeight)
     }
   }
 
