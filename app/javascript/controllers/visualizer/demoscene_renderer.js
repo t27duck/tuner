@@ -5,6 +5,9 @@ export class DemosceneRenderer {
     this._scrollX = 0
     this._offscreen = null
     this._offCtx = null
+    this._distLUT = null
+    this._distW = 0
+    this._distH = 0
     this._initSinTable()
     this._initFont()
     this.resize(w, h)
@@ -17,6 +20,7 @@ export class DemosceneRenderer {
     this._h = h
     this._offscreen = null
     this._offCtx = null
+    this._distLUT = null
     this._pixelSize = Math.max(2, Math.floor(Math.min(w, h) / 120))
   }
 
@@ -69,6 +73,7 @@ export class DemosceneRenderer {
     const ph = Math.ceil(h / ps)
 
     this._ensureOffscreen(pw, ph)
+    this._ensureDistLUT(pw, ph)
     const oc = this._offCtx
     const imageData = oc.createImageData(pw, ph)
     const data = imageData.data
@@ -83,13 +88,15 @@ export class DemosceneRenderer {
     const sd = 14 + Math.sin(t * 0.2) * 3
     const sr = 10 + Math.cos(t * 0.35) * 2
 
+    const sinConvert = 256 / (2 * Math.PI)
+
     for (let py = 0; py < ph; py++) {
       for (let px = 0; px < pw; px++) {
-        const v1 = this._sin(((px / sx + t) * 256 / (2 * Math.PI)) & 255)
-        const v2 = this._sin(((py / sy + t * 0.7) * 256 / (2 * Math.PI)) & 255)
-        const v3 = this._sin((((px + py) / sd + t * 0.5) * 256 / (2 * Math.PI)) & 255)
-        const dist = Math.sqrt((px - pw / 2) * (px - pw / 2) + (py - ph / 2) * (py - ph / 2))
-        const v4 = this._sin(((dist / sr + t * 0.3) * 256 / (2 * Math.PI)) & 255)
+        const v1 = this._sin(((px / sx + t) * sinConvert) & 255)
+        const v2 = this._sin(((py / sy + t * 0.7) * sinConvert) & 255)
+        const v3 = this._sin((((px + py) / sd + t * 0.5) * sinConvert) & 255)
+        const dist = this._distLUT[py * pw + px]
+        const v4 = this._sin(((dist / sr + t * 0.3) * sinConvert) & 255)
 
         // Combine and map to palette index
         let v = (v1 + v2 + v3 + v4) / 4
@@ -124,12 +131,10 @@ export class DemosceneRenderer {
     ctx.save()
     ctx.globalAlpha = 0.75
 
-    const gradients = RASTER_GRADIENTS
-
     for (let b = 0; b < barCount; b++) {
       const phase = (b / barCount) * Math.PI * 2
       const cy = h / 2 + Math.sin(t * speed + phase) * amplitude
-      const gradient = gradients[b % gradients.length]
+      const gradient = RASTER_GRADIENTS[b]
 
       for (let s = 0; s < scanlines; s++) {
         const ratio = s / (scanlines - 1)
@@ -149,7 +154,7 @@ export class DemosceneRenderer {
   }
 
   _renderScrollText(ctx, w, h, treble, energy) {
-    const text = "TUNER MUSIC PLAYER ... GREETINGS TO ALL CODERS AND MUSICIANS ... LONG LIVE THE DEMOSCENE ... "
+    const text = SCROLL_MESSAGE
     const charSize = Math.max(8, Math.floor(Math.min(w, h) / 40))
     const pixelScale = Math.max(1, Math.floor(charSize / 8))
     const charW = 8 * pixelScale
@@ -167,18 +172,24 @@ export class DemosceneRenderer {
 
     for (let i = 0; i < text.length; i++) {
       const x = i * charW - this._scrollX
-      // Wrap around
-      const drawX = ((x % totalTextW) + totalTextW) % totalTextW - charW
 
-      if (drawX < -charW || drawX > w + charW) continue
+      // Draw at original position and wrapped position for seamless loop
+      for (const offset of [0, totalTextW]) {
+        const drawX = x + offset
+        if (drawX < -charW || drawX > w) continue
 
-      const sinOffset = Math.sin(drawX * 0.02 + t * 3) * sineAmplitude
+        const sinOffset = Math.sin(drawX * 0.02 + t * 3) * sineAmplitude
 
-      // Rainbow color cycling through bright C64 colors
-      const colorIdx = Math.floor((i + this._time * 5) % SCROLL_COLORS.length)
-      const color = SCROLL_COLORS[colorIdx]
+        // Rainbow color cycling through bright C64 colors
+        const colorIdx = Math.floor((i + this._time * 5) % SCROLL_COLORS.length)
+        const color = SCROLL_COLORS[colorIdx]
 
-      this._drawBitmapChar(ctx, text[i], drawX, baseY + sinOffset, pixelScale, color)
+        const drawY = baseY + sinOffset
+
+        // Dark drop shadow for readability against plasma
+        this._drawBitmapChar(ctx, text[i], drawX + pixelScale, drawY + pixelScale, pixelScale, "rgba(0,0,0,0.7)")
+        this._drawBitmapChar(ctx, text[i], drawX, drawY, pixelScale, color)
+      }
     }
 
     ctx.restore()
@@ -213,6 +224,20 @@ export class DemosceneRenderer {
     this._offscreen.width = w
     this._offscreen.height = h
     this._offCtx = this._offscreen.getContext("2d")
+  }
+
+  _ensureDistLUT(w, h) {
+    if (this._distLUT && this._distW === w && this._distH === h) return
+    this._distW = w
+    this._distH = h
+    this._distLUT = new Float32Array(w * h)
+    const cx = w / 2
+    const cy = h / 2
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        this._distLUT[y * w + x] = Math.sqrt((x - cx) * (x - cx) + (y - cy) * (y - cy))
+      }
+    }
   }
 
   _initSinTable() {
@@ -266,6 +291,8 @@ export class DemosceneRenderer {
   }
 }
 
+const SCROLL_MESSAGE = "TUNER MUSIC PLAYER ... GREETINGS TO ALL CODERS AND MUSICIANS ... LONG LIVE THE DEMOSCENE ... "
+
 // C64 16-color palette
 const C64_PALETTE = [
   [0, 0, 0],        // 0  Black
@@ -286,20 +313,20 @@ const C64_PALETTE = [
   [187, 187, 187]   // 15 Light Grey
 ]
 
-// Raster bar gradients (symmetric, using C64-ish colors)
+// 6 unique raster bar gradients (dim-to-bright, no black fringes)
 const RASTER_GRADIENTS = [
-  // Cyan scheme
-  ["#000000", "#003333", "#006666", "#009999", "#00cccc", "#00ffff"],
-  // Green scheme
-  ["#000000", "#003300", "#006600", "#009900", "#00cc00", "#00ff00"],
-  // Purple scheme
-  ["#000000", "#330033", "#660066", "#990099", "#cc00cc", "#ff00ff"],
-  // Orange scheme
-  ["#000000", "#331100", "#663300", "#995500", "#cc7700", "#ff9900"],
-  // Cyan scheme (repeat)
-  ["#000000", "#003333", "#006666", "#009999", "#00cccc", "#00ffff"],
-  // Green scheme (repeat)
-  ["#000000", "#003300", "#006600", "#009900", "#00cc00", "#00ff00"]
+  // Cyan
+  ["#0a2626", "#104040", "#1a6666", "#269999", "#33cccc", "#44ffff"],
+  // Green
+  ["#0a260a", "#104010", "#1a661a", "#269926", "#33cc33", "#44ff44"],
+  // Purple
+  ["#260a26", "#401040", "#661a66", "#992699", "#cc33cc", "#ff44ff"],
+  // Orange
+  ["#261a0a", "#402a10", "#66441a", "#996626", "#cc8833", "#ffaa44"],
+  // Red
+  ["#260a0a", "#401010", "#661a1a", "#992626", "#cc3333", "#ff4444"],
+  // Blue
+  ["#0a0a26", "#101040", "#1a1a66", "#262699", "#3333cc", "#4444ff"]
 ]
 
 // Bright C64 colors for scroll text rainbow
