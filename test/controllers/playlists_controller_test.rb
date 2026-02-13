@@ -81,4 +81,24 @@ class PlaylistsControllerTest < ActionDispatch::IntegrationTest
     end
     assert_redirected_to playlist_path(@playlist)
   end
+
+  test "update with invalid params returns unprocessable_entity" do
+    patch playlist_url(@playlist), params: { playlist: { name: "" } }
+    assert_response :unprocessable_entity
+    assert_equal "Test Playlist", @playlist.reload.name
+  end
+
+  test "update description" do
+    patch playlist_url(@playlist), params: { playlist: { name: @playlist.name, description: "New description" } }
+    assert_redirected_to playlist_path(@playlist)
+    assert_equal "New description", @playlist.reload.description
+  end
+
+  test "show with songs in playlist displays song titles" do
+    @playlist.add_song(@song)
+
+    get playlist_url(@playlist)
+    assert_response :success
+    assert_select "td", text: /Test Song/
+  end
 end

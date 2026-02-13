@@ -160,6 +160,29 @@ class SongsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "update json success returns ok" do
+    patch song_url(@song, format: :json), params: { song: { title: "JSON Title" } }
+    assert_response :ok
+    assert_equal "JSON Title", @song.reload.title
+  end
+
+  test "update json failure returns unprocessable_entity" do
+    # Clear file_path so presence validation fails on next save
+    @song.update_column(:file_path, nil)
+
+    patch song_url(@song, format: :json), params: { song: { title: "Fail" } }
+    assert_response :unprocessable_entity
+  end
+
+  test "destroy succeeds when file already missing from disk" do
+    @song.update_column(:file_path, "/nonexistent/missing.mp3")
+
+    assert_difference("Song.count", -1) do
+      delete song_url(@song)
+    end
+    assert_redirected_to songs_path
+  end
+
   test "index sorts by title by default" do
     Song.delete_all
 

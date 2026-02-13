@@ -54,6 +54,85 @@ class OrganizeFilesJobTest < ActiveSupport::TestCase
     assert File.exist?(old_path)
   end
 
+  test "song_ids parameter organizes only specific songs" do
+    song1 = create_test_song("song 1.mp3", "song1.mp3", title: "Song1", artist: "Artist1")
+    song2 = create_test_song("song 2.mp3", "song2.mp3", title: "Song2", artist: "Artist2")
+    song2_original_path = song2.file_path
+
+    OrganizeFilesJob.perform_now("<Artist>/<Title>", song_ids: [ song1.id ])
+
+    song1.reload
+    song2.reload
+    assert_equal File.join(@temp_dir, "Artist1", "Song1.mp3"), song1.file_path
+    assert_equal song2_original_path, song2.file_path
+  end
+
+  test "disc template token uses disc_number" do
+    song = create_test_song("song 1.mp3", "song1.mp3", title: "Song", artist: "Artist", disc_number: 2)
+
+    OrganizeFilesJob.perform_now("<Artist>/Disc <Disc>/<Title>")
+
+    song.reload
+    assert_equal File.join(@temp_dir, "Artist", "Disc 2", "Song.mp3"), song.file_path
+  end
+
+  test "year template token uses year" do
+    song = create_test_song("song 1.mp3", "song1.mp3", title: "Song", artist: "Artist", year: 1999)
+
+    OrganizeFilesJob.perform_now("<Artist>/<Year>/<Title>")
+
+    song.reload
+    assert_equal File.join(@temp_dir, "Artist", "1999", "Song.mp3"), song.file_path
+  end
+
+  test "genre template token uses genre" do
+    song = create_test_song("song 1.mp3", "song1.mp3", title: "Song", artist: "Artist", genre: "Rock")
+
+    OrganizeFilesJob.perform_now("<Genre>/<Artist>/<Title>")
+
+    song.reload
+    assert_equal File.join(@temp_dir, "Rock", "Artist", "Song.mp3"), song.file_path
+  end
+
+  test "filename template token preserves original filename" do
+    song = create_test_song("song 1.mp3", "original_name.mp3", title: "Song", artist: "Artist")
+
+    OrganizeFilesJob.perform_now("<Artist>/<Filename>")
+
+    song.reload
+    assert_equal File.join(@temp_dir, "Artist", "original_name.mp3"), song.file_path
+  end
+
+  test "nil fields use fallback values in template" do
+    song = Song.create!(
+      title: "Song",
+      artist: nil,
+      album: nil,
+      genre: nil,
+      year: nil,
+      file_path: File.join(@temp_dir, "song1.mp3"),
+      file_size: 1000,
+      duration: 180
+    )
+    FileUtils.cp(Rails.root.join("test/fixtures/files/song 1.mp3"), song.file_path)
+
+    OrganizeFilesJob.perform_now("<Artist>/<Album>/<Genre>/<Year>/<Title>")
+
+    song.reload
+    expected = File.join(@temp_dir, "Unknown Artist", "Unknown Album", "Unknown Genre", "0000", "Song.mp3")
+    assert_equal expected, song.file_path
+  end
+
+  test "preview with song_ids only previews specific songs" do
+    song1 = create_test_song("song 1.mp3", "song1.mp3", title: "Song1", artist: "Artist1")
+    song2 = create_test_song("song 2.mp3", "song2.mp3", title: "Song2", artist: "Artist2")
+
+    changes = OrganizeFilesJob.preview("<Artist>/<Title>", song_ids: [ song1.id ])
+
+    assert_equal 1, changes.size
+    assert_equal song1.id, changes.first[:id]
+  end
+
   private
 
   def create_test_song(fixture_name, dest_subpath, attrs = {})

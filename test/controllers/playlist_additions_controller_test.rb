@@ -49,4 +49,36 @@ class PlaylistAdditionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 1, data["skipped"]
     assert_includes data["message"], "already in"
   end
+
+  test "adding multiple songs at once" do
+    song2 = Song.create!(file_path: "/tmp/pa_test2.mp3", title: "Song 2")
+
+    assert_difference("PlaylistSong.count", 2) do
+      post playlist_additions_url, params: { playlist_id: @playlist.id, song_ids: [ @song.id, song2.id ] }
+    end
+    assert_includes flash[:notice], "2 songs added"
+  end
+
+  test "mixed added and skipped songs" do
+    @playlist.add_song(@song)
+    song2 = Song.create!(file_path: "/tmp/pa_test3.mp3", title: "Song 2")
+
+    assert_difference("PlaylistSong.count", 1) do
+      post playlist_additions_url, params: { playlist_id: @playlist.id, song_ids: [ @song.id, song2.id ] }
+    end
+    assert_includes flash[:notice], "1 song added"
+    assert_includes flash[:notice], "1 already in playlist"
+  end
+
+  test "non-existent song_id is silently skipped" do
+    assert_difference("PlaylistSong.count", 1) do
+      post playlist_additions_url, params: { playlist_id: @playlist.id, song_ids: [ @song.id, -999 ] }
+    end
+    assert_includes flash[:notice], "1 song added"
+  end
+
+  test "non-existent playlist_id returns not found" do
+    post playlist_additions_url, params: { playlist_id: -999, song_ids: [ @song.id ] }
+    assert_response :not_found
+  end
 end

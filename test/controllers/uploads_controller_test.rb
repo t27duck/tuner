@@ -1,6 +1,8 @@
 require "test_helper"
 
 class UploadsControllerTest < ActionDispatch::IntegrationTest
+  include ActionCable::TestHelper
+
   setup do
     @temp_dir = Dir.mktmpdir("uploads_test_#{Process.pid}_#{Thread.current.object_id}")
     @original_music_root = Configuration.music_root
